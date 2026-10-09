@@ -1,0 +1,458 @@
+/* ================================
+   1. VARIABLES & THEME
+   ================================ */
+:root {
+    --bg: #f6f6f8;
+    --card: #ffffff;
+    --card2: #f1f1f3;
+    --border: #e8e8ec;
+    --text: #111111;
+    --text2: #6b7280;
+    --accent: #111111;
+
+    --high: #ef4444;
+    --med: #f59e0b;
+    --low: #10b981;
+}
+
+body.dark {
+    --bg: #0e0e10;
+    --card: #18181b;
+    --card2: #232326;
+    --border: #2a2a2e;
+    --text: #f5f5f5;
+    --text2: #9ca3af;
+    --accent: #f5f5f5;
+}
+
+/* ================================
+   2. RESET & LAYOUT
+   ================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.2s, color 0.2s;
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ================================
+   3. SIDEBAR - Categories & Tags
+   ================================ */
+.sidebar {
+    width: 260px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+}
+
+.side-label {
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    color: var(--text2);
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cat-btn {
+    width: 100%;
+    text-align: left;
+    padding: 9px 10px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text2);
+    display: flex;
+    justify-content: space-between;
+    transition: 0.15s;
+}
+
+.cat-btn:hover {
+    background: var(--card2);
+}
+
+.cat-btn.active {
+    background: var(--card2);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.add-cat-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.add-cat-row input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+}
+
+#addCatBtn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card2);
+    cursor: pointer;
+}
+
+#tagList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag-pill {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+}
+
+.tag-pill.active {
+    background: var(--text);
+    color: var(--bg);
+}
+
+/* ================================
+   4. MAIN CONTENT
+   ================================ */
+.main {
+    flex: 1;
+    padding: 28px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.topbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    font-size: 14px;
+}
+
+#sortInput {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+}
+
+/* ================================
+   5. COMPOSER - Add Task Area
+   ================================ */
+.composer {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+#taskInput {
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    background: transparent;
+    color: var(--text);
+}
+
+.composer-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.composer-row select,
+.composer-row input[type="date"] {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+}
+
+#addBtn {
+    margin-left: auto;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ================================
+   6. FILTERS
+   ================================ */
+.filters {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.filter-btn.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+}
+
+#taskCount {
+    margin-left: auto;
+    font-size: 13px;
+    color: var(--text2);
+}
+
+#clearBtn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+}
+
+/* ================================
+   7. TASK CARDS
+   ================================ */
+#taskList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.task-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    cursor: grab;
+    transition: 0.15s;
+}
+
+.task-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+.task-card.high { border-left-color: var(--high); }
+.task-card.medium { border-left-color: var(--med); }
+.task-card.low { border-left-color: var(--low); }
+
+.task-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.task-top input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--text);
+}
+
+.task-title {
+    flex: 1;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.task-title.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0 0 30px;
+}
+
+.badge {
+    font-size: 11px;
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+}
+
+.sub-area {
+    margin: 14px 0 0 30px;
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.sub-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 5px 0;
+}
+
+/* ================================
+   8. START / END DATE + REPEAT + OVERDUE
+   ================================ */
+.badge.start {
+    background: #e0f2fe;
+    color: #0284c7;
+    border-color: #bae6fd;
+}
+
+.badge.end {
+    background: #f3e8ff;
+    color: #7c3aed;
+    border-color: #e9d5ff;
+}
+
+.badge.repeat {
+    background: #dbeafe;
+    color: #2563eb;
+    border-color: #bfdbfe;
+    font-weight: 600;
+}
+
+.badge.overdue {
+    background: #ef4444 !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+    animation: pulseRed 1.5s infinite;
+    font-weight: 700;
+}
+
+@keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+}
+
+.task-card.overdue-card {
+    border-color: #fecaca;
+    background: #fff5f5;
+}
+
+body.dark .task-card.overdue-card {
+    background: #2a1515;
+    border-color: #7f1d1d;
+}
+
+.progress-line {
+    height: 4px;
+    background: var(--card2);
+    border-radius: 10px;
+    margin: 12px 0 0 30px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--text);
+    transition: width 0.3s;
+}
+
+.progress-fill.overdue-fill {
+    background: #ef4444;
+}
+
+/* ================================
+   9. BOTTOM & RESPONSIVE
+   ================================ */
+.side-bottom {
+    margin-top: auto;
+}
+
+#themeBtn {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.hint {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; }
+    .main { padding: 16px; }
+}

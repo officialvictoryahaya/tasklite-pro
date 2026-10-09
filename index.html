@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskLite Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="logo"><span class="dot"></span> TaskLite Pro</div>
+        <div class="side-section">
+            <p class="side-label">LISTS</p>
+            <div id="categoryList"></div>
+            <div class="add-cat-row">
+                <input id="newCatInput" placeholder="New list...">
+                <button id="addCatBtn">Add</button>
+            </div>
+        </div>
+        <div class="side-section">
+            <p class="side-label">TAGS</p>
+            <div id="tagList"></div>
+        </div>
+        <div class="side-bottom">
+            <button id="themeBtn">🌙 Dark Mode</button>
+            <p class="hint">N = new task<br>/ = search<br>Esc = clear</p>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <input id="searchInput" placeholder="Search tasks, #tags, category...">
+            <select id="sortInput">
+                <option value="order">Manual ↕ Drag</option>
+                <option value="endDate">End Date</option>
+                <option value="priority">Priority</option>
+                <option value="alpha">A-Z</option>
+            </select>
+        </header>
+
+        <div class="composer">
+            <input id="taskInput" placeholder="What needs to be done? Use #tag for tags">
+            <div class="composer-row">
+                <select id="priorityInput">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium" selected>🟡 Medium</option>
+                    <option value="high">🔴 High</option>
+                </select>
+                <input type="date" id="startDateInput">
+                <input type="date" id="endDateInput">
+                <select id="repeatInput">
+                    <option value="none">No Repeat</option>
+                    <option value="daily">🔁 Daily</option>
+                    <option value="weekly">🔁 Weekly</option>
+                    <option value="monthly">🔁 Monthly</option>
+                </select>
+                <select id="catInput"></select>
+                <button id="addBtn">Add Task</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button data-filter="all" class="filter-btn active">All</button>
+            <button data-filter="active" class="filter-btn">Pending</button>
+            <button data-filter="done" class="filter-btn">Done</button>
+            <span id="taskCount"></span>
+            <button id="clearBtn">Clear Done</button>
+        </div>
+
+        <ul id="taskList"></ul>
+    </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
