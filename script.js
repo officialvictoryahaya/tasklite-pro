@@ -20,7 +20,7 @@ function getDateStatus(task){
     const start = task.startDate ? new Date(task.startDate) : null;
     if(start) start.setHours(0,0,0,0);
     const diff = Math.ceil((end - today) / (1000*60*60*24));
-    if(today > end) return { type: 'overdue', label: `⚠️ Overdue by ${Math.abs(diff)} day${Math.abs(diff)!==1?'s':''}` };
+    if(today > end) return { type: 'overdue', label: `⚠ Overdue by ${Math.abs(diff)} day${Math.abs(diff)!==1?'s':''}` };
     if(diff === 0) return { type: 'due-today', label: '⏰ Due Today' };
     if(diff === 1) return { type: 'due-soon', label: 'Due Tomorrow' };
     if(diff <= 3) return { type: 'due-soon', label: `Due in ${diff} days` };
@@ -161,13 +161,11 @@ window.toggleTask = id=>{
     if(!t) return;
     const wasDone = t.completed;
     t.completed = !t.completed;
-    // REPEATING LOGIC
     if(!wasDone && t.completed && t.repeat && t.repeat!=='none'){
         let newStart = t.startDate, newEnd = t.endDate;
         if(t.repeat==='daily'){ if(newStart) newStart=addDays(newStart,1); if(newEnd) newEnd=addDays(newEnd,1); }
         if(t.repeat==='weekly'){ if(newStart) newStart=addDays(newStart,7); if(newEnd) newEnd=addDays(newEnd,7); }
         if(t.repeat==='monthly'){ if(newStart) newStart=addMonths(newStart,1); if(newEnd) newEnd=addMonths(newEnd,1); }
-        // create next occurrence
         tasks.push({
             id: Date.now().toString()+Math.random().toString(36).slice(2),
             text: t.text,
@@ -187,10 +185,10 @@ window.toggleTask = id=>{
     save(); render();
 }
 window.deleteTask = id=>{ tasks=tasks.filter(t=>t.id!==id); save(); render(); }
-window.toggleExpand = id=>{ const t=tasks.find(x=>x.id===id); if(t) t._expanded=!t._expanded; render(); }
+window.toggleExpand = id=>{ const t=tasks.find(x=>x.id===id);Date if(t) t._expanded=!t._expanded; render(); }
 window.addSub = id=>{
     const input = document.getElementById(`sub-${id}`); if(!input ||!input.value.trim()) return;
-    const t = tasks.find(x=>x.id===id); t.subtasks.push({id:Date.now().toString(), text:input.value, completed:false});
+    const t = tasks.find(x=>x.id===id); t.subtasks.push({id:.now().toString(), text:input.value, completed:false});
     save(); render();
 }
 window.toggleSub = (taskId, subId)=>{ const t=tasks.find(x=>x.id===taskId); const s=t.subtasks.find(x=>x.id===subId); if(s) s.completed=!s.completed; save(); render(); }
@@ -226,11 +224,4 @@ window.addEventListener('keydown', e=>{
     if(e.key.toLowerCase()==='n'){ e.preventDefault(); taskInput.focus(); }
     if(e.key==='/'){ e.preventDefault(); searchInput.focus(); }
 });
-if(tasks.length===0){
-    tasks=[
-        {id:'1',text:'Water plants #home',completed:false,priority:'medium',startDate:new Date().toISOString().slice(0,10),endDate:new Date().toISOString().slice(0,10),repeat:'daily',category:'Personal',tags:['home'],subtasks:[],createdAt:Date.now(),order:0,_expanded:true},
-        {id:'2',text:'Ship TaskLite Pro #urgent',completed:false,priority:'high',startDate:new Date().toISOString().slice(0,10),endDate:new Date(Date.now()+86400000).toISOString().slice(0,10),repeat:'none',category:'Work',tags:['urgent'],subtasks:[],createdAt:Date.now(),order:1,_expanded:false}
-    ];
-    save();
-}
 render();
