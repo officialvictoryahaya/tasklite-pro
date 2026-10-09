@@ -185,10 +185,10 @@ window.toggleTask = id=>{
     save(); render();
 }
 window.deleteTask = id=>{ tasks=tasks.filter(t=>t.id!==id); save(); render(); }
-window.toggleExpand = id=>{ const t=tasks.find(x=>x.id===id);Date if(t) t._expanded=!t._expanded; render(); }
+window.toggleExpand = id=>{ const t=tasks.find(x=>x.id===id); if(t) t._expanded=!t._expanded; render(); }
 window.addSub = id=>{
     const input = document.getElementById(`sub-${id}`); if(!input ||!input.value.trim()) return;
-    const t = tasks.find(x=>x.id===id); t.subtasks.push({id:.now().toString(), text:input.value, completed:false});
+    const t = tasks.find(x=>x.id===id); t.subtasks.push({id:Date.now().toString(), text:input.value, completed:false});
     save(); render();
 }
 window.toggleSub = (taskId, subId)=>{ const t=tasks.find(x=>x.id===taskId); const s=t.subtasks.find(x=>x.id===subId); if(s) s.completed=!s.completed; save(); render(); }
