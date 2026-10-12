@@ -4,6 +4,7 @@ const searchInput = $('searchInput'), sortInput = $('sortInput'), priorityInput 
 const startDateInput = $('startDateInput'), endDateInput = $('endDateInput'), repeatInput = $('repeatInput'), catInput = $('catInput');
 const categoryList = $('categoryList'), tagList = $('tagList'), taskCount = $('taskCount');
 
+// Use same keys as your working version - empty by default for new users
 let tasks = JSON.parse(localStorage.getItem('tasklite-pro') || '[]');
 let categories = JSON.parse(localStorage.getItem('tasklite-cats') || '["Work","Personal","Shopping","Study"]');
 let currentCat = 'all', currentFilter = 'all', activeTag = null, dragId = null;
@@ -11,13 +12,16 @@ let dark = localStorage.getItem('tasklite-dark') === '1';
 if(dark) document.body.classList.add('dark');
 
 function save(){ localStorage.setItem('tasklite-pro', JSON.stringify(tasks)); localStorage.setItem('tasklite-cats', JSON.stringify(categories)); }
+function parseTags(text){ const m = text.match(/#[\w-]+/g) || []; return m.map(t => t.replace('#','').toLowerCase()); }
 
 // ===== BROWSER NOTIFICATION FEATURE =====
 function requestNotifyPermission(){
   if(!('Notification' in window)) return;
   if(Notification.permission === 'default'){
     Notification.requestPermission().then(p=>{
-      if(p==='granted') new Notification('TaskLite Pro','✅ Notifications enabled! You will get reminders when tasks are due.');
+      if(p==='granted') {
+        try{ new Notification('TaskLite Pro','✅ Notifications enabled! You will get reminders when tasks are due.'); }catch(e){}
+      }
     });
   }
 }
@@ -36,8 +40,6 @@ function checkDueTasks(){
   });
 }
 // ===== END NOTIFICATION =====
-
-function parseTags(text){ const m = text.match(/#[\w-]+/g) || []; return m.map(t => t.replace('#','').toLowerCase()); }
 
 function getDateStatus(task){
     if(!task.endDate || task.completed) return null;
@@ -74,10 +76,7 @@ function renderCats(){
         return `<button class="cat-btn ${currentCat===c?'active':''}" data-cat="${c}">${c} <span>${count}</span></button>`
     }).join('');
     catInput.innerHTML = categories.map(c=>`<option value="${c}">${c}</option>`).join('');
-    document.querySelectorAll('.cat-btn').forEach(b=> b.onclick = ()=>{ currentCat = b.dataset.cat; requestNotifyPermission();
-setTimeout(checkDueTasks, 3000);
-setInterval(checkDueTasks, 60000);
-render(); });
+    document.querySelectorAll('.cat-btn').forEach(b=> b.onclick = ()=>{ currentCat = b.dataset.cat; render(); });
 }
 function renderTags(){
     const all = [...new Set(tasks.flatMap(t=>t.tags))];
@@ -102,6 +101,9 @@ function render(){
     renderCats(); renderTags();
     const filtered = getFiltered();
     taskList.innerHTML = '';
+    if(filtered.length===0){
+        taskList.innerHTML = `<li style="text-align:center; padding:40px; color:var(--text2); list-style:none;"><div style="font-size:40px;">📝</div><p>No tasks yet</p><small>Add your first task above and get browser reminders when due!</small></li>`;
+    }
     filtered.forEach(task=>{
         const status = getDateStatus(task);
         const progress = getProgress(task);
@@ -123,7 +125,7 @@ function render(){
                 ${status?`<span class="badge ${isOverdue?'overdue':''}">${status.label}</span>`:''}
                 <span class="badge">${task.category}</span>
                 ${task.tags.map(t=>`<span class="badge">#${t}</span>`).join('')}
-                <button class="badge" onclick="toggleExpand('${task.id}')">${task._expanded?'Hide':'Edit / Subtasks'}</button>
+                <button class="badge" onclick="toggleExpand('${task.id}')">${task._expanded?'Hide':'Edit'}</button>
             </div>
             ${progress!==null?`<div class="progress-line"><div class="progress-fill ${isOverdue?'overdue-fill':''}" style="width:${progress}%"></div></div>`:''}
             ${task._expanded?`
@@ -167,7 +169,7 @@ function render(){
 }
 function addTask(){
     const text = taskInput.value.trim(); if(!text) return;
-    tasks.push({
+    const task = {
         id: Date.now().toString(),
         text,
         completed:false,
@@ -181,12 +183,12 @@ function addTask(){
         createdAt: Date.now(),
         order: tasks.length,
         _expanded:false
-    });
-    if(endDateInput.value) requestNotifyPermission();
+    };
+    tasks.push(task);
+    if(task.endDate) requestNotifyPermission();
     taskInput.value=''; startDateInput.value=''; endDateInput.value=''; repeatInput.value='none';
     save(); render();
-    if(Notification.permission==='granted') showNotification('Task Added', `"${text}" added. Reminder set!`);
-
+    if(Notification.permission==='granted') showNotification('Task Added!', `"${task.text}" added. Reminder set!`);
 }
 window.toggleTask = id=>{
     const t = tasks.find(x=>x.id===id);
@@ -215,6 +217,7 @@ window.toggleTask = id=>{
         });
     }
     save(); render();
+    if(t.completed && Notification.permission==='granted') showNotification('Task Completed!','Great job: '+t.text);
 }
 window.deleteTask = id=>{ tasks=tasks.filter(t=>t.id!==id); save(); render(); }
 window.toggleExpand = id=>{ const t=tasks.find(x=>x.id===id); if(t) t._expanded=!t._expanded; render(); }
@@ -259,18 +262,4 @@ window.addEventListener('keydown', e=>{
 requestNotifyPermission();
 setTimeout(checkDueTasks, 3000);
 setInterval(checkDueTasks, 60000);
-render();
-}
-$('themeBtn').onclick = ()=>{
-    document.body.classList.toggle('dark');
-    dark=!dark; localStorage.setItem('tasklite-dark', dark?'1':'0');
-}
-window.addEventListener('keydown', e=>{
-    if(e.target.tagName==='INPUT' || e.target.tagName==='SELECT') {
-        if(e.key==='Escape'){ e.target.blur(); searchInput.value=''; activeTag=null; render(); }
-        return;
-    }
-    if(e.key.toLowerCase()==='n'){ e.preventDefault(); taskInput.focus(); }
-    if(e.key==='/'){ e.preventDefault(); searchInput.focus(); }
-});
 render();
