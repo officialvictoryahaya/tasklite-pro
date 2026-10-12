@@ -24,7 +24,7 @@
         </div>
         <div class="side-bottom">
             <button id="themeBtn">🌙 Dark Mode</button>
-            <p class="hint">N = new task<br>/ = search<br>Esc = clear</p>
+            <p class="hint">N = new task<br>/ = search<br>Esc = clear</p>l
         </div>
     </aside>
 
@@ -47,8 +47,14 @@
                     <option value="medium" selected>🟡 Medium</option>
                     <option value="high">🔴 High</option>
                 </select>
-                <input type="date" id="startDateInput">
-                <input type="date" id="endDateInput">
+              <div style="display:flex; flex-direction:column;">
+                   <label style="font-size:11px; font-weight:600;">Start date</label>
+                   <input type="date" id="startDateInput">
+              </div>
+              <div style="display:flex; flex-direction:column;">
+                  <label style="font-size:11px; font-weight:600;">Due date</label>
+                  <input type="date" id="endDateInput">
+                </div>>
                 <select id="repeatInput">
                     <option value="none">No Repeat</option>
                     <option value="daily">🔁 Daily</option>
