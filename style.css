@@ -1,5 +1,5 @@
 /* ============================================
-   TASKLITE PRO - FINAL WITH SPINNER
+   TASKLITE PRO - CLEAN ARRANGED + MOBILE FIX
    ============================================ */
 
 /* ---------- 1. VARIABLES ---------- */
@@ -208,10 +208,7 @@ body {
     top: 0;
     height: 100vh;
     overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
 }
-.sidebar::-webkit-scrollbar { display: none; }
 .logo {
     font-weight: 800;
     font-size: 20px;
@@ -236,7 +233,7 @@ body {
 .cat-btn {
     width: 100%;
     text-align: left;
-    padding: 9px 10px;
+    padding: 10px 12px;
     border-radius: 10px;
     border: none;
     background: transparent;
@@ -244,7 +241,9 @@ body {
     color: var(--text2);
     display: flex;
     justify-content: space-between;
+    transition: 0.15s;
 }
+.cat-btn:hover { background: var(--card2); }
 .cat-btn.active {
     background: var(--card2);
     color: var(--text);
@@ -257,7 +256,7 @@ body {
 }
 .add-cat-row input {
     flex: 1;
-    padding: 8px 10px;
+    padding: 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--bg);
@@ -265,60 +264,54 @@ body {
     outline: none;
 }
 #addCatBtn {
-    padding: 8px 12px;
+    padding: 10px 14px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--card2);
+    border: none;
+    background: var(--text);
+    color: var(--bg);
     cursor: pointer;
+    font-weight: 600;
 }
 .tag-pill {
     font-size: 12px;
-    padding: 4px 10px;
+    padding: 6px 10px;
     border-radius: 20px;
     background: var(--card2);
     border: 1px solid var(--border);
     cursor: pointer;
+    display: inline-block;
+    margin: 3px;
 }
 .side-bottom { margin-top: auto; }
-
-/* FIXED: Email no longer crosses border */
 .user-box {
-    padding: 12px 0;
+    padding: 16px 0 12px;
     border-top: 1px solid var(--border);
-    margin-bottom: 12px;
-    overflow: hidden;
-}
-.user-box > div {
-    overflow: hidden;
 }
 #userEmailDisplay {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--text2);
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    word-break: break-all;
 }
 .logout-btn {
     width: 100%;
-    margin-top: 8px;
-    padding: 8px;
-    border-radius: 8px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
     background: #fff0f0;
     border: 1px solid #fcc;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
     color: #c00;
+    font-weight: 600;
 }
 #themeBtn {
     width: 100%;
     background: var(--card2);
     border: 1px solid var(--border);
-    padding: 10px 12px;
+    padding: 12px;
     border-radius: 10px;
     cursor: pointer;
+    font-weight: 600;
 }
 .hint {
     font-size: 11px;
@@ -330,7 +323,7 @@ body {
 /* ---------- 6. MAIN ---------- */
 .main {
     flex: 1;
-    padding: 28px;
+    padding: 24px;
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
@@ -338,7 +331,26 @@ body {
 .topbar {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    align-items: center;
+}
+.search-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0 14px;
+}
+.search-wrap input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 12px 0;
+    outline: none;
+    color: var(--text);
 }
 #searchInput {
     flex: 1;
@@ -348,7 +360,6 @@ body {
     background: var(--card);
     color: var(--text);
     outline: none;
-    font-size: 14px;
 }
 #sortInput {
     padding: 12px;
@@ -357,7 +368,7 @@ body {
     background: var(--card);
     color: var(--text);
 }
-#exportBtn {
+.export-btn {
     background: #111;
     color: white;
     padding: 12px 16px;
@@ -365,75 +376,78 @@ body {
     border: none;
     cursor: pointer;
     font-weight: 700;
+    white-space: nowrap;
 }
-
-/* FIXED: Composer card does not overflow */
 .composer {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 20px;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 18px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    overflow: hidden;
 }
 #taskInput {
     width: 100%;
-    padding: 12px 0;
+    padding: 8px 0 14px;
     border: none;
     outline: none;
     font-size: 16px;
     background: transparent;
     color: var(--text);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
 }
 .composer-row {
     display: flex;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 12px;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-end;
 }
 .date-field {
     display: flex;
     flex-direction: column;
-    min-width: 0;
+    gap: 5px;
+    flex: 1;
+    min-width: 120px;
 }
 .date-field label {
-    font-size: 11px;
-    font-weight: 600;
-    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text2);
 }
-.composer-row select,
-.composer-row input[type="date"] {
-    padding: 8px 12px;
-    border-radius: 10px;
+.date-field select,
+.date-field input[type="date"] {
+    padding: 11px 12px;
+    border-radius: 12px;
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
-    font-size: 13px;
+    font-size: 13.5px;
+    font-weight: 500;
     width: 100%;
-    box-sizing: border-box;
 }
 #addBtn {
-    margin-left: auto;
     background: var(--text);
     color: var(--bg);
     border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 700;
     cursor: pointer;
+    height: 44px;
 }
 .filters {
     display: flex;
     gap: 8px;
     align-items: center;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
 }
+.filter-group { display: flex; gap: 6px; }
 .filter-btn {
-    padding: 7px 14px;
+    padding: 8px 14px;
     border-radius: 20px;
     border: 1px solid var(--border);
     background: var(--card);
@@ -462,34 +476,41 @@ body {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 .task-card {
     background: var(--card);
     border: 1px solid var(--border);
     border-left: 4px solid var(--border);
     border-radius: 14px;
-    padding: 16px;
+    padding: 14px 16px;
 }
 .task-card.high { border-left-color: var(--high); }
 .task-card.medium { border-left-color: var(--med); }
 .task-card.low { border-left-color: var(--low); }
 .task-top {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
 }
-.task-title { flex: 1; font-weight: 500; font-size: 15px; }
-.task-title.done { text-decoration: line-through; opacity: 0.5; }
+.task-title {
+    flex: 1;
+    font-weight: 500;
+    font-size: 15px;
+}
+.task-title.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
 .meta {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
-    margin: 12px 0 0 30px;
+    margin: 10px 0 0 28px;
 }
 .badge {
     font-size: 11px;
-    padding: 4px 9px;
+    padding: 4px 8px;
     border-radius: 20px;
     background: var(--card2);
     border: 1px solid var(--border);
@@ -497,31 +518,52 @@ body {
 
 /* ---------- 7. MOBILE FIX ---------- */
 @media (max-width: 768px) {
-    .app { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; position: static; }
-    .main { padding: 14px; }
-    
-    .topbar { flex-direction: column; }
-    #searchInput, #sortInput, #exportBtn { width: 100%; }
-    
-    /* FIXED: All cards stay inside */
+    .app {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 18px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+    .main {
+        padding: 14px;
+    }
+    .topbar {
+        flex-wrap: wrap;
+    }
+    .search-wrap,
+    #searchInput {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+    #sortInput,
+    .export-btn {
+        flex: 1;
+    }
     .composer {
         padding: 14px;
-        overflow: hidden;
+        border-radius: 16px;
     }
     .composer-row {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
     .date-field {
-        width: 100% !important;
-        min-width: 100% !important;
+        min-width: 0;
     }
     #addBtn {
+        grid-column: span 2;
         width: 100%;
-        margin-left: 0;
+        margin-top: 4px;
         height: 48px;
+    }
+    #taskCount {
+        width: 100%;
+        margin: 0;
     }
 }
