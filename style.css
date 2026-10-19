@@ -707,3 +707,62 @@ body.dark .task-card.overdue {
         margin: 0;
     }
 }
+
+
+
+
+
+/* === FIX START DATE & END DATE ON PHONE/TABLET === */
+
+/* For tablets */
+@media (max-width: 1024px) {
+  input[type="date"],
+  .start-date,
+  .end-date,
+  #start-date,
+  #end-date,
+  #due-date {
+    font-size: 14px !important;
+    padding: 8px 10px !important;
+  }
+}
+
+/* For phones - make it smaller and stack */
+@media (max-width: 768px) {
+  /* If your start and end date are in a row, stack them */
+  .date-row,
+  .form-row,
+  .task-dates,
+  .date-group {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Make the date inputs smaller on phone */
+  input[type="date"],
+  .start-date,
+  .end-date,
+  #start-date,
+  #end-date,
+  #due-date {
+    width: 100% !important;
+    font-size: 13px !important;
+    padding: 8px 10px !important;
+    height: 38px !important;
+  }
+
+  label[for="start-date"],
+  label[for="end-date"],
+  label[for="due-date"] {
+    font-size: 12px !important;
+  }
+}
+
+/* For very small phones */
+@media (max-width: 480px) {
+  input[type="date"] {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+    height: 36px !important;
+  }
+}
