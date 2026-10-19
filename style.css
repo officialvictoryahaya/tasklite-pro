@@ -1,6 +1,8 @@
-/* ================================
-   1. VARIABLES & THEME
-   ================================ */
+/* ============================================
+   TASKLITE PRO - FINAL WITH SPINNER
+   ============================================ */
+
+/* ---------- 1. VARIABLES ---------- */
 :root {
     --bg: #f6f6f8;
     --card: #ffffff;
@@ -9,10 +11,11 @@
     --text: #111111;
     --text2: #6b7280;
     --accent: #111111;
-
     --high: #ef4444;
     --med: #f59e0b;
     --low: #10b981;
+    --shadow: 0 8px 32px rgba(17,17,17,0.06);
+    --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
 }
 
 body.dark {
@@ -25,14 +28,12 @@ body.dark {
     --accent: #f5f5f5;
 }
 
-/* ================================
-   2. RESET & LAYOUT
-   ================================ */
+/* ---------- 2. RESET ---------- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
 }
 
 body {
@@ -47,9 +48,225 @@ body {
     min-height: 100vh;
 }
 
-/* ================================
-   3. SIDEBAR - Categories & Tags
-   ================================ */
+/* ---------- 3. AUTH PAGE ---------- */
+#authPage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 24px;
+}
+
+#authPage.hidden {
+    display: none;
+}
+
+.auth-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 44px 36px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.auth-logo {
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.auth-logo .dot {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.auth-subtitle {
+    color: var(--text2);
+    font-size: 14.5px;
+    margin-bottom: 32px;
+}
+
+.auth-card input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    font-size: 14.5px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.auth-card input:focus {
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.06);
+}
+
+.auth-btn-primary {
+    width: 100%;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    font-size: 14.5px;
+}
+
+.auth-btn-secondary {
+    width: 100%;
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    font-size: 14.5px;
+}
+
+.auth-btn-google {
+    width: 100%;
+    background: white;
+    color: #1f1f1f;
+    border: 1.5px solid var(--border);
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    font-size: 14.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.auth-btn-google:hover {
+    border-color: var(--text);
+    background: #fafafa;
+}
+
+.auth-divider {
+    margin: 22px 0;
+    color: var(--text2);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.auth-error {
+    color: #ef4444;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 14px;
+    min-height: 18px;
+}
+
+.auth-hint {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 16px;
+    opacity: 0.7;
+}
+
+#appPage {
+    display: none;
+}
+
+#appPage.active {
+    display: flex;
+}
+
+/* ---------- 4. LOADING SPINNER ---------- */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(246, 246, 248, 0.9);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#loadingOverlay.active {
+    display: flex;
+}
+
+.spinner-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--text);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.spinner-box p {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    margin: 0;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+body.dark #loadingOverlay {
+    background: rgba(14, 14, 16, 0.9);
+}
+
+/* ---------- 5. SIDEBAR ---------- */
 .sidebar {
     width: 260px;
     background: var(--card);
@@ -135,12 +352,6 @@ body {
     cursor: pointer;
 }
 
-#tagList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
 .tag-pill {
     font-size: 12px;
     padding: 4px 10px;
@@ -150,14 +361,51 @@ body {
     cursor: pointer;
 }
 
-.tag-pill.active {
-    background: var(--text);
-    color: var(--bg);
+.side-bottom {
+    margin-top: auto;
 }
 
-/* ================================
-   4. MAIN CONTENT
-   ================================ */
+.user-box {
+    padding: 12px 0;
+    border-top: 1px solid var(--border);
+    margin-bottom: 12px;
+}
+
+#userEmailDisplay {
+    font-size: 12px;
+    color: var(--text2);
+    word-break: break-all;
+}
+
+.logout-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    background: #fff0f0;
+    border: 1px solid #fcc;
+    cursor: pointer;
+    font-size: 12px;
+    color: #c00;
+}
+
+#themeBtn {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.hint {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
+/* ---------- 6. MAIN ---------- */
 .main {
     flex: 1;
     padding: 28px;
@@ -191,9 +439,6 @@ body {
     color: var(--text);
 }
 
-/* ================================
-   5. COMPOSER - Add Task Area
-   ================================ */
 .composer {
     background: var(--card);
     border: 1px solid var(--border);
@@ -221,6 +466,18 @@ body {
     align-items: center;
 }
 
+.date-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-field label {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: var(--text2);
+}
+
 .composer-row select,
 .composer-row input[type="date"] {
     padding: 8px 12px;
@@ -242,9 +499,6 @@ body {
     cursor: pointer;
 }
 
-/* ================================
-   6. FILTERS
-   ================================ */
 .filters {
     display: flex;
     gap: 8px;
@@ -283,9 +537,6 @@ body {
     text-decoration: underline;
 }
 
-/* ================================
-   7. TASK CARDS
-   ================================ */
 #taskList {
     list-style: none;
     display: flex;
@@ -299,7 +550,6 @@ body {
     border-left: 4px solid var(--border);
     border-radius: 14px;
     padding: 16px;
-    cursor: grab;
     transition: 0.15s;
 }
 
@@ -308,20 +558,22 @@ body {
     box-shadow: 0 6px 20px rgba(0,0,0,0.05);
 }
 
-.task-card.high { border-left-color: var(--high); }
-.task-card.medium { border-left-color: var(--med); }
-.task-card.low { border-left-color: var(--low); }
+.task-card.high {
+    border-left-color: var(--high);
+}
+
+.task-card.medium {
+    border-left-color: var(--med);
+}
+
+.task-card.low {
+    border-left-color: var(--low);
+}
 
 .task-top {
     display: flex;
     gap: 12px;
     align-items: center;
-}
-
-.task-top input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--text);
 }
 
 .task-title {
@@ -350,109 +602,18 @@ body {
     border: 1px solid var(--border);
 }
 
-.sub-area {
-    margin: 14px 0 0 30px;
-    background: var(--card2);
-    border-radius: 12px;
-    padding: 12px;
-}
-
-.sub-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 5px 0;
-}
-
-/* ================================
-   8. START / END DATE + REPEAT + OVERDUE
-   ================================ */
-.badge.start {
-    background: #e0f2fe;
-    color: #0284c7;
-    border-color: #bae6fd;
-}
-
-.badge.end {
-    background: #f3e8ff;
-    color: #7c3aed;
-    border-color: #e9d5ff;
-}
-
-.badge.repeat {
-    background: #dbeafe;
-    color: #2563eb;
-    border-color: #bfdbfe;
-    font-weight: 600;
-}
-
-.badge.overdue {
-    background: #ef4444 !important;
-    color: white !important;
-    border-color: #ef4444 !important;
-    animation: pulseRed 1.5s infinite;
-    font-weight: 700;
-}
-
-@keyframes pulseRed {
-    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
-    70% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
-    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-}
-
-.task-card.overdue-card {
-    border-color: #fecaca;
-    background: #fff5f5;
-}
-
-body.dark .task-card.overdue-card {
-    background: #2a1515;
-    border-color: #7f1d1d;
-}
-
-.progress-line {
-    height: 4px;
-    background: var(--card2);
-    border-radius: 10px;
-    margin: 12px 0 0 30px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--text);
-    transition: width 0.3s;
-}
-
-.progress-fill.overdue-fill {
-    background: #ef4444;
-}
-
-/* ================================
-   9. BOTTOM & RESPONSIVE
-   ================================ */
-.side-bottom {
-    margin-top: auto;
-}
-
-#themeBtn {
-    width: 100%;
-    background: var(--card2);
-    border: 1px solid var(--border);
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.hint {
-    font-size: 11px;
-    color: var(--text2);
-    margin-top: 16px;
-    line-height: 1.6;
-}
-
 @media (max-width: 768px) {
-    .app { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; position: static; }
-    .main { padding: 16px; }
+    .app {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+    }
+
+    .main {
+        padding: 16px;
+    }
 }
