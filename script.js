@@ -24,15 +24,24 @@ function showDashboard(user){
   authPage.classList.add('hidden');
   appPage.classList.add('active');
   
-  // === SHOW NAME & AVATAR ===
-  const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
-  const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=111&color=fff`;
+  // === FIXED NAME & PICTURE ===
+  const meta = user.user_metadata || {};
+  console.log("Google data:", meta); // open F12 to see what Google sends
+  
+  const fullName = meta.full_name || meta.name || meta.user_name || user.email.split('@')[0];
+  const avatarUrl = meta.avatar_url || meta.picture || meta.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=111827&color=fff&bold=true`;
   
   if(userEmailDisplay) userEmailDisplay.textContent = user.email;
   if(userNameDisplay) userNameDisplay.textContent = `Hi, ${fullName} 👋`;
+  
   if(userAvatar) {
     userAvatar.src = avatarUrl;
     userAvatar.style.display = 'block';
+    userAvatar.referrerPolicy = "no-referrer"; // THIS FIXES GOOGLE BLOCK
+    userAvatar.onerror = () => {
+      // if Google image fails, use letter avatar
+      userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=111827&color=fff&bold=true`;
+    };
   }
   
   loadFromCloud();
