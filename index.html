@@ -72,27 +72,41 @@
                 <option value="alpha">A-Z</option>
             </select>
             <button id="exportBtn" style="background:#111; color:white; padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:600;">📊 Export</button>
-        </header>
-        <div class="composer">
-            <input id="taskInput" placeholder="What needs to be done? Use #tag for tags">
-            <div class="composer-row">
-                <select id="priorityInput">
-                    <option value="low">🟢 Low</option>
-                    <option value="medium" selected>🟡 Medium</option>
-                    <option value="high">🔴 High</option>
-                </select>
-                <div class="date-field"><label>Start date</label><input type="date" id="startDateInput"></div>
-                <div class="date-field"><label>Due date</label><input type="date" id="endDateInput"></div>
-                <select id="repeatInput">
-                    <option value="none">No Repeat</option>
-                    <option value="daily">🔁 Daily</option>
-                    <option value="weekly">🔁 Weekly</option>
-                    <option value="monthly">🔁 Monthly</option>
-                </select>
-                <select id="catInput"></select>
-                <button id="addBtn">Add Task</button>
-            </div>
+        </header><div class="composer">
+    <input id="taskInput" placeholder="What needs to be done? Use #tag for tags">
+    <div class="composer-row">
+        <div class="date-field">
+            <label>Priority</label>
+            <select id="priorityInput">
+                <option value="low">🟢 Low</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="high">🔴 High</option>
+            </select>
         </div>
+        <div class="date-field">
+            <label>Start date</label>
+            <input type="date" id="startDateInput">
+        </div>
+        <div class="date-field">
+            <label>Due date</label>
+            <input type="date" id="endDateInput">
+        </div>
+        <div class="date-field">
+            <label>Repeat</label>
+            <select id="repeatInput">
+                <option value="none">No Repeat</option>
+                <option value="daily">🔁 Daily</option>
+                <option value="weekly">🔁 Weekly</option>
+                <option value="monthly">🔁 Monthly</option>
+            </select>
+        </div>
+        <div class="date-field">
+            <label>List</label>
+            <select id="catInput"></select>
+        </div>
+        <button id="addBtn">Add Task</button>
+    </div>
+</div>
         <div class="filters">
             <button data-filter="all" class="filter-btn active">All</button>
             <button data-filter="active" class="filter-btn">Pending</button>
