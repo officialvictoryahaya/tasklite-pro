@@ -1,5 +1,5 @@
 /* ============================================
-   TASKLITE PRO - CLEAN ARRANGED + MOBILE FIX
+   TASKLITE PRO - WELL ARRANGED FINAL
    ============================================ */
 
 /* ---------- 1. VARIABLES ---------- */
@@ -16,6 +16,7 @@
     --low: #10b981;
     --shadow: 0 8px 32px rgba(17,17,17,0.06);
 }
+
 body.dark {
     --bg: #0e0e10;
     --card: #18181b;
@@ -33,12 +34,14 @@ body.dark {
     box-sizing: border-box;
     font-family: 'Inter', system-ui, sans-serif;
 }
+
 body {
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     transition: background 0.2s, color 0.2s;
 }
+
 .app {
     display: flex;
     min-height: 100vh;
@@ -53,7 +56,11 @@ body {
     background: var(--bg);
     padding: 24px;
 }
-#authPage.hidden { display: none; }
+
+#authPage.hidden {
+    display: none;
+}
+
 .auth-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -64,6 +71,7 @@ body {
     box-shadow: var(--shadow);
     text-align: center;
 }
+
 .auth-logo {
     font-weight: 800;
     font-size: 26px;
@@ -74,6 +82,7 @@ body {
     gap: 10px;
     margin-bottom: 8px;
 }
+
 .auth-logo .dot {
     width: 14px;
     height: 14px;
@@ -81,11 +90,13 @@ body {
     border-radius: 50%;
     display: inline-block;
 }
+
 .auth-subtitle {
     color: var(--text2);
     font-size: 14.5px;
     margin-bottom: 32px;
 }
+
 .auth-card input {
     width: 100%;
     padding: 14px 16px;
@@ -97,6 +108,7 @@ body {
     font-size: 14.5px;
     margin-bottom: 12px;
 }
+
 .auth-btn-primary {
     width: 100%;
     background: var(--text);
@@ -108,6 +120,7 @@ body {
     cursor: pointer;
     margin-top: 8px;
 }
+
 .auth-btn-secondary {
     width: 100%;
     background: var(--card2);
@@ -119,6 +132,7 @@ body {
     cursor: pointer;
     margin-top: 12px;
 }
+
 .auth-btn-google {
     width: 100%;
     background: white;
@@ -134,6 +148,7 @@ body {
     justify-content: center;
     gap: 10px;
 }
+
 .auth-divider {
     margin: 22px 0;
     color: var(--text2);
@@ -145,6 +160,7 @@ body {
     align-items: center;
     gap: 12px;
 }
+
 .auth-divider::before,
 .auth-divider::after {
     content: "";
@@ -152,14 +168,21 @@ body {
     height: 1px;
     background: var(--border);
 }
+
 .auth-error {
     color: #ef4444;
     font-size: 13px;
     margin-top: 14px;
     min-height: 18px;
 }
-#appPage { display: none; }
-#appPage.active { display: flex; }
+
+#appPage {
+    display: none;
+}
+
+#appPage.active {
+    display: flex;
+}
 
 /* ---------- 4. LOADING SPINNER ---------- */
 #loadingOverlay {
@@ -172,7 +195,11 @@ body {
     justify-content: center;
     z-index: 9999;
 }
-#loadingOverlay.active { display: flex; }
+
+#loadingOverlay.active {
+    display: flex;
+}
+
 .spinner-box {
     background: var(--card);
     border: 1px solid var(--border);
@@ -185,6 +212,7 @@ body {
     align-items: center;
     gap: 16px;
 }
+
 .spinner {
     width: 40px;
     height: 40px;
@@ -193,7 +221,12 @@ body {
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 /* ---------- 5. SIDEBAR ---------- */
 .sidebar {
@@ -208,7 +241,14 @@ body {
     top: 0;
     height: 100vh;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
 .logo {
     font-weight: 800;
     font-size: 20px;
@@ -216,12 +256,14 @@ body {
     align-items: center;
     gap: 8px;
 }
+
 .logo .dot {
     width: 10px;
     height: 10px;
     background: var(--accent);
     border-radius: 50%;
 }
+
 .side-label {
     font-size: 11px;
     letter-spacing: 1.2px;
@@ -230,6 +272,7 @@ body {
     font-weight: 600;
     text-transform: uppercase;
 }
+
 .cat-btn {
     width: 100%;
     text-align: left;
@@ -243,17 +286,23 @@ body {
     justify-content: space-between;
     transition: 0.15s;
 }
-.cat-btn:hover { background: var(--card2); }
+
+.cat-btn:hover {
+    background: var(--card2);
+}
+
 .cat-btn.active {
     background: var(--card2);
     color: var(--text);
     font-weight: 600;
 }
+
 .add-cat-row {
     display: flex;
     gap: 6px;
     margin-top: 12px;
 }
+
 .add-cat-row input {
     flex: 1;
     padding: 10px;
@@ -263,6 +312,7 @@ body {
     color: var(--text);
     outline: none;
 }
+
 #addCatBtn {
     padding: 10px 14px;
     border-radius: 8px;
@@ -272,6 +322,7 @@ body {
     cursor: pointer;
     font-weight: 600;
 }
+
 .tag-pill {
     font-size: 12px;
     padding: 6px 10px;
@@ -282,16 +333,31 @@ body {
     display: inline-block;
     margin: 3px;
 }
-.side-bottom { margin-top: auto; }
+
+.side-bottom {
+    margin-top: auto;
+}
+
 .user-box {
     padding: 16px 0 12px;
     border-top: 1px solid var(--border);
+    overflow: hidden;
 }
+
+.user-box > div {
+    overflow: hidden;
+}
+
 #userEmailDisplay {
     font-size: 11px;
     color: var(--text2);
-    word-break: break-all;
+    display: block;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 .logout-btn {
     width: 100%;
     margin-top: 10px;
@@ -304,6 +370,7 @@ body {
     color: #c00;
     font-weight: 600;
 }
+
 #themeBtn {
     width: 100%;
     background: var(--card2);
@@ -313,6 +380,7 @@ body {
     cursor: pointer;
     font-weight: 600;
 }
+
 .hint {
     font-size: 11px;
     color: var(--text2);
@@ -328,30 +396,14 @@ body {
     margin: 0 auto;
     width: 100%;
 }
+
 .topbar {
     display: flex;
     gap: 10px;
     margin-bottom: 16px;
     align-items: center;
 }
-.search-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 0 14px;
-}
-.search-wrap input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 12px 0;
-    outline: none;
-    color: var(--text);
-}
+
 #searchInput {
     flex: 1;
     padding: 12px 16px;
@@ -361,6 +413,7 @@ body {
     color: var(--text);
     outline: none;
 }
+
 #sortInput {
     padding: 12px;
     border-radius: 12px;
@@ -368,16 +421,7 @@ body {
     background: var(--card);
     color: var(--text);
 }
-.export-btn {
-    background: #111;
-    color: white;
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    white-space: nowrap;
-}
+
 .composer {
     background: var(--card);
     border: 1px solid var(--border);
@@ -385,7 +429,9 @@ body {
     padding: 18px;
     margin-bottom: 18px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    overflow: hidden;
 }
+
 #taskInput {
     width: 100%;
     padding: 8px 0 14px;
@@ -397,12 +443,14 @@ body {
     border-bottom: 1px solid var(--border);
     margin-bottom: 14px;
 }
+
 .composer-row {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
     align-items: flex-end;
 }
+
 .date-field {
     display: flex;
     flex-direction: column;
@@ -410,6 +458,7 @@ body {
     flex: 1;
     min-width: 120px;
 }
+
 .date-field label {
     font-size: 10px;
     font-weight: 800;
@@ -417,6 +466,7 @@ body {
     text-transform: uppercase;
     color: var(--text2);
 }
+
 .date-field select,
 .date-field input[type="date"] {
     padding: 11px 12px;
@@ -427,7 +477,9 @@ body {
     font-size: 13.5px;
     font-weight: 500;
     width: 100%;
+    box-sizing: border-box;
 }
+
 #addBtn {
     background: var(--text);
     color: var(--bg);
@@ -438,6 +490,7 @@ body {
     cursor: pointer;
     height: 44px;
 }
+
 .filters {
     display: flex;
     gap: 8px;
@@ -445,7 +498,7 @@ body {
     margin-bottom: 16px;
     flex-wrap: wrap;
 }
-.filter-group { display: flex; gap: 6px; }
+
 .filter-btn {
     padding: 8px 14px;
     border-radius: 20px;
@@ -454,16 +507,19 @@ body {
     cursor: pointer;
     font-size: 13px;
 }
+
 .filter-btn.active {
     background: var(--text);
     color: var(--bg);
     border-color: var(--text);
 }
+
 #taskCount {
     margin-left: auto;
     font-size: 13px;
     color: var(--text2);
 }
+
 #clearBtn {
     background: none;
     border: none;
@@ -472,12 +528,14 @@ body {
     font-size: 13px;
     text-decoration: underline;
 }
+
 #taskList {
     list-style: none;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
 .task-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -485,29 +543,55 @@ body {
     border-radius: 14px;
     padding: 14px 16px;
 }
-.task-card.high { border-left-color: var(--high); }
-.task-card.medium { border-left-color: var(--med); }
-.task-card.low { border-left-color: var(--low); }
+
+.task-card.high {
+    border-left-color: var(--high);
+}
+
+.task-card.medium {
+    border-left-color: var(--med);
+}
+
+.task-card.low {
+    border-left-color: var(--low);
+}
+
+.task-card.overdue {
+    border-left-color: #ef4444 !important;
+    background: #fff5f5 !important;
+    border-color: #fecaca !important;
+}
+
+body.dark .task-card.overdue {
+    background: #2a1515 !important;
+    border-color: #7f1d1d !important;
+}
+
 .task-top {
     display: flex;
     gap: 10px;
     align-items: center;
 }
+
 .task-title {
     flex: 1;
     font-weight: 500;
     font-size: 15px;
+    cursor: pointer;
 }
+
 .task-title.done {
     text-decoration: line-through;
     opacity: 0.5;
 }
+
 .meta {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
     margin: 10px 0 0 28px;
 }
+
 .badge {
     font-size: 11px;
     padding: 4px 8px;
@@ -516,11 +600,61 @@ body {
     border: 1px solid var(--border);
 }
 
-/* ---------- 7. MOBILE FIX ---------- */
+.badge.overdue-badge {
+    background: #ef4444;
+    color: white;
+    font-weight: 700;
+    animation: pulse 1.5s infinite;
+}
+
+.subtask-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 13px;
+    margin-left: 28px;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* ---------- 7. MODAL FOR EDIT ---------- */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 16px;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+/* ---------- 8. MOBILE FIX ---------- */
 @media (max-width: 768px) {
+
     .app {
         flex-direction: column;
     }
+
     .sidebar {
         width: 100%;
         height: auto;
@@ -529,39 +663,45 @@ body {
         border-right: none;
         border-bottom: 1px solid var(--border);
     }
+
     .main {
-        padding: 14px;
+        padding: 12px;
     }
+
     .topbar {
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 8px;
     }
-    .search-wrap,
-    #searchInput {
-        width: 100%;
-        flex: 1 1 100%;
-    }
+
+    #searchInput,
     #sortInput,
-    .export-btn {
-        flex: 1;
+    #exportBtn {
+        width: 100%;
     }
+
     .composer {
         padding: 14px;
         border-radius: 16px;
     }
+
     .composer-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
+
     .date-field {
-        min-width: 0;
+        width: 100% !important;
+        min-width: 100% !important;
     }
+
     #addBtn {
-        grid-column: span 2;
         width: 100%;
-        margin-top: 4px;
         height: 48px;
+        margin-left: 0;
+        margin-top: 4px;
     }
+
     #taskCount {
         width: 100%;
         margin: 0;
