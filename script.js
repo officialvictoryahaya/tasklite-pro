@@ -1,6 +1,6 @@
-// TaskLite Pro - Final with Google Loading Spinner
+// TaskLite Pro - Final with Google Loading Spinner + Export + User Name
 const SUPABASE_URL = 'https://zfclurscqotfeekcvhey.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmY2x1cnNjcW90ZmVla2N2aGV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzc5MDksImV4cCI6MjEwNzcxMzkwOX0.yW_i3DD7-mw2p1WmsDIJfw8Uk82dRX_p95F5k5hWy1E'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.[STRIPPED 127 bytes].yW_i3DD7-mw2p1WmsDIJfw8Uk82dRX_p95F5k5hWy1E'
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 const $ = id => document.getElementById(id);
@@ -9,7 +9,8 @@ const taskInput = $('taskInput'), addBtn = $('addBtn'), taskList = $('taskList')
 const searchInput = $('searchInput'), sortInput = $('sortInput'), priorityInput = $('priorityInput');
 const startDateInput = $('startDateInput'), endDateInput = $('endDateInput'), repeatInput = $('repeatInput'), catInput = $('catInput');
 const categoryList = $('categoryList'), tagList = $('tagList'), taskCount = $('taskCount');
-const emailInput = $('email'), passwordInput = $('password'), authError = $('authError'), userEmailDisplay = $('userEmailDisplay');
+const emailInput = $('email'), passwordInput = $('password'), authError = $('authError');
+const userEmailDisplay = $('userEmailDisplay'), userNameDisplay = $('userNameDisplay'), userAvatar = $('userAvatar');
 
 let tasks = JSON.parse(localStorage.getItem('tasklite-pro') || '[]');
 let categories = JSON.parse(localStorage.getItem('tasklite-cats') || '["Work","Personal","Shopping","Study"]');
@@ -22,7 +23,18 @@ function showDashboard(user){
   currentUser = user;
   authPage.classList.add('hidden');
   appPage.classList.add('active');
-  userEmailDisplay.textContent = user.email;
+  
+  // === SHOW NAME & AVATAR ===
+  const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
+  const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=111&color=fff`;
+  
+  if(userEmailDisplay) userEmailDisplay.textContent = user.email;
+  if(userNameDisplay) userNameDisplay.textContent = `Hi, ${fullName} 👋`;
+  if(userAvatar) {
+    userAvatar.src = avatarUrl;
+    userAvatar.style.display = 'block';
+  }
+  
   loadFromCloud();
 }
 
@@ -129,6 +141,32 @@ function saveLocal(){ localStorage.setItem('tasklite-pro', JSON.stringify(tasks)
 function save(){ saveLocal(); }
 function parseTags(text){ const m = text.match(/#[\w-]+/g) || []; return m.map(t => t.replace('#','').toLowerCase()); }
 
+// === EXPORT TO EXCEL WITH STATUS ===
+function exportTasksToExcel(){
+  if(tasks.length === 0){ alert('No tasks to export!'); return; }
+  
+  const exportData = tasks.map(t => ({
+    Title: (t.text || '').replace(/#[\w-]+/g,'').trim(),
+    Status: t.completed ? 'Done ✅' : 'Pending ⏳',
+    Priority: t.priority || 'medium',
+    Category: t.category || 'Work',
+    Tags: (t.tags || []).join(', '),
+    Start_Date: t.startDate || '',
+    Due_Date: t.endDate || '',
+    Created: new Date(t.createdAt).toLocaleDateString()
+  }));
+
+  // Use XLSX library
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Tasks");
+  
+  // Auto width
+  ws['!cols'] = [{wch:30},{wch:12},{wch:10},{wch:12},{wch:15},{wch:12},{wch:12},{wch:12}];
+  
+  XLSX.writeFile(wb, `TaskLite-Pro-${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
 function renderCats(){
     categoryList.innerHTML = `<button class="cat-btn ${currentCat==='all'?'active':''}" data-cat="all">📥 All Tasks <span>${tasks.length}</span></button>` +
     categories.map(c => {
@@ -174,6 +212,7 @@ function render(){
                 <span class="badge ${task.priority}">${task.priority}</span>
                 ${task.endDate?`<span class="badge end">🏁 ${task.endDate}</span>`:''}
                 <span class="badge">${task.category}</span>
+                <span class="badge">${task.completed ? 'Done ✅' : 'Pending ⏳'}</span>
                 ${task.tags.map(t=>`<span class="badge">#${t}</span>`).join('')}
             </div>
         `;
@@ -232,5 +271,7 @@ if($('themeBtn')) $('themeBtn').onclick = ()=>{
     document.body.classList.toggle('dark');
     dark=!dark; localStorage.setItem('tasklite-dark', dark?'1':'0');
 }
+if($('exportBtn')) $('exportBtn').onclick = exportTasksToExcel;
+
 checkSession();
 render();
