@@ -5,9 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TaskLite Pro</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<div class="app">
+
+<div id="authPage">
+    <div id="loadingOverlay">
+        <div class="spinner-box">
+            <div class="spinner"></div>
+            <p>Connecting to Google...</p>
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <div class="auth-logo"><span class="dot"></span> TaskLite Pro</div>
+        <p class="auth-subtitle">Your tasks, synced to the cloud</p>
+        <input id="email" type="email" placeholder="Email address">
+        <input id="password" type="password" placeholder="Password (min 6 chars)">
+        <button class="auth-btn-primary" onclick="signIn()">Sign In</button>
+        <button class="auth-btn-secondary" onclick="signUp()">Create Account</button>
+        <div class="auth-divider">or continue with</div>
+        <button class="auth-btn-google" onclick="signInWithGoogle()">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18"> Continue with Google
+        </button>
+        <div id="authError" class="auth-error"></div>
+        <p class="auth-hint">Use any email, even test@test.com for testing</p>
+    </div>
+</div>
+
+<div id="appPage" class="app">
     <aside class="sidebar">
         <div class="logo"><span class="dot"></span> TaskLite Pro</div>
         <div class="side-section">
@@ -23,11 +49,14 @@
             <div id="tagList"></div>
         </div>
         <div class="side-bottom">
+            <div class="user-box">
+                <p id="userEmailDisplay"></p>
+                <button onclick="signOut()" class="logout-btn">Logout</button>
+            </div>
             <button id="themeBtn">🌙 Dark Mode</button>
             <p class="hint">N = new task<br>/ = search<br>Esc = clear</p>
         </div>
     </aside>
-
     <main class="main">
         <header class="topbar">
             <input id="searchInput" placeholder="Search tasks, #tags, category...">
@@ -38,7 +67,6 @@
                 <option value="alpha">A-Z</option>
             </select>
         </header>
-
         <div class="composer">
             <input id="taskInput" placeholder="What needs to be done? Use #tag for tags">
             <div class="composer-row">
@@ -47,14 +75,14 @@
                     <option value="medium" selected>🟡 Medium</option>
                     <option value="high">🔴 High</option>
                 </select>
-              <div style="display:flex; flex-direction:column;">
-                   <label style="font-size:11px; font-weight:600; margin-bottom:2px;">Start date</label>
-                   <input type="date" id="startDateInput">
-              </div>
-              <div style="display:flex; flex-direction:column;">
-                  <label style="font-size:11px; font-weight:600; margin-bottom:2px;">Due date</label>
-                  <input type="date" id="endDateInput">
-              </div>
+                <div class="date-field">
+                    <label>Start date</label>
+                    <input type="date" id="startDateInput">
+                </div>
+                <div class="date-field">
+                    <label>Due date</label>
+                    <input type="date" id="endDateInput">
+                </div>
                 <select id="repeatInput">
                     <option value="none">No Repeat</option>
                     <option value="daily">🔁 Daily</option>
@@ -65,7 +93,6 @@
                 <button id="addBtn">Add Task</button>
             </div>
         </div>
-
         <div class="filters">
             <button data-filter="all" class="filter-btn active">All</button>
             <button data-filter="active" class="filter-btn">Pending</button>
@@ -73,7 +100,6 @@
             <span id="taskCount"></span>
             <button id="clearBtn">Clear Done</button>
         </div>
-
         <ul id="taskList"></ul>
     </main>
 </div>
