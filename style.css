@@ -712,57 +712,78 @@ body.dark .task-card.overdue {
 
 
 
-/* === FIX START DATE & END DATE ON PHONE/TABLET === */
-
-/* For tablets */
-@media (max-width: 1024px) {
-  input[type="date"],
-  .start-date,
-  .end-date,
-  #start-date,
-  #end-date,
-  #due-date {
-    font-size: 14px !important;
-    padding: 8px 10px !important;
-  }
-}
-
-/* For phones - make it smaller and stack */
+/* === MAKE START DATE & DUE DATE SMALLER ON PHONE === */
 @media (max-width: 768px) {
-  /* If your start and end date are in a row, stack them */
-  .date-row,
-  .form-row,
-  .task-dates,
-  .date-group {
-    flex-direction: column !important;
-    gap: 10px !important;
-  }
-
-  /* Make the date inputs smaller on phone */
+  /* Make the date boxes same height as Priority box */
   input[type="date"],
-  .start-date,
-  .end-date,
+  input[type="datetime-local"],
   #start-date,
-  #end-date,
-  #due-date {
-    width: 100% !important;
-    font-size: 13px !important;
-    padding: 8px 10px !important;
-    height: 38px !important;
+  #due-date,
+  #startDate,
+  #dueDate {
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 14px !important;
+    font-size: 15px !important;
+    background-color: #f5f5f5 !important;
   }
 
-  label[for="start-date"],
-  label[for="end-date"],
-  label[for="due-date"] {
-    font-size: 12px !important;
+  /* Make the labels smaller too */
+  label {
+    font-size: 11px !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Reduce space between fields on phone */
+  .form-group,
+  .field-group,
+  .input-group {
+    margin-bottom: 14px !important;
   }
 }
 
-/* For very small phones */
-@media (max-width: 480px) {
+/* For very small phones like iPhone SE */
+@media (max-width: 390px) {
   input[type="date"] {
-    font-size: 12px !important;
-    padding: 6px 8px !important;
-    height: 36px !important;
+    height: 42px !important;
+    font-size: 14px !important;
+  }
+}/* === MAKE START DATE & DUE DATE SMALLER ON PHONE === */
+@media (max-width: 768px) {
+  /* Make the date boxes same height as Priority box */
+  input[type="date"],
+  input[type="datetime-local"],
+  #start-date,
+  #due-date,
+  #startDate,
+  #dueDate {
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 14px !important;
+    font-size: 15px !important;
+    background-color: #f5f5f5 !important;
+  }
+
+  /* Make the labels smaller too */
+  label {
+    font-size: 11px !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Reduce space between fields on phone */
+  .form-group,
+  .field-group,
+  .input-group {
+    margin-bottom: 14px !important;
+  }
+}
+
+/* For very small phones like iPhone SE */
+@media (max-width: 390px) {
+  input[type="date"] {
+    height: 42px !important;
+    font-size: 14px !important;
   }
 }
