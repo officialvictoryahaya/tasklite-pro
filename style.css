@@ -649,114 +649,46 @@ body.dark .task-card.overdue {
 }
 
 /* ---------- 8. MOBILE FIX ---------- */
-/* ---------- 8. MOBILE FIX - FIXED FOR DATE INPUTS ---------- */
+/* ---------- 8. MOBILE FIX - FINAL SMALL DATE ---------- */
 @media (max-width: 768px) {
-
-    .app {
-        flex-direction: column;
-    }
-
+    .app { flex-direction: column; }
     .sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        padding: 18px;
-        border-right: none;
+        width: 100%; height: auto; position: static;
+        padding: 18px; border-right: none;
         border-bottom: 1px solid var(--border);
     }
-
-    .main {
-        padding: 12px;
-    }
-
-    .topbar {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    #searchInput,
-    #sortInput,
-    #exportBtn {
-        width: 100%;
-    }
-
-    .composer {
-        padding: 16px 14px;
-        border-radius: 18px;
-    }
-
-    #taskInput {
-        font-size: 15px;
-        padding: 6px 0 12px;
-        margin-bottom: 12px;
-    }
-
-    .composer-row {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .date-field {
-        width: 100% !important;
-        min-width: 100% !important;
-        gap: 4px;
-    }
-
-    .date-field label {
-        font-size: 10px !important;
-        margin-bottom: 2px;
-    }
-
-    /* THIS IS THE FIX - SMALLER ON PHONE */
-    .date-field select,
-    .date-field input[type="date"] {
-        padding: 9px 12px !important;
-        font-size: 13px !important;
-        height: 40px !important;
-        min-height: 40px !important;
-        border-radius: 10px !important;
-        background: #f4f4f5 !important;
-    }
-
-    body.dark .date-field select,
-    body.dark .date-field input[type="date"] {
-        background: var(--card2) !important;
-    }
-
-    #addBtn {
-        width: 100%;
-        height: 46px;
-        margin-left: 0;
-        margin-top: 2px;
-        border-radius: 12px;
-        font-size: 15px;
-    }
-
-    #taskCount {
-        width: 100%;
-        margin: 0;
-        font-size: 12px;
-    }
-}
-
-/* Extra small phones - even smaller */
-@media (max-width: 480px) {
+    .main { padding: 12px; }
+    .topbar { flex-direction: column; gap: 8px; }
+    #searchInput, #sortInput, #exportBtn { width: 100%; }
+    
+    .composer { padding: 14px; border-radius: 16px; }
+    .composer-row { flex-direction: column; gap: 10px; }
+    .date-field { width: 100% !important; min-width: 100% !important; }
+    
+    /* FINAL FIX - MAKE DATE BOXES SMALL LIKE PRIORITY */
     .date-field select,
     .date-field input[type="date"] {
         height: 38px !important;
         min-height: 38px !important;
-        font-size: 12.5px !important;
-        padding: 8px 10px !important;
+        max-height: 38px !important;
+        padding: 0 12px !important;
+        font-size: 14px !important;
+        line-height: 38px !important;
+        border-radius: 12px !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        background: var(--card2) !important;
+        border: 1px solid var(--border) !important;
     }
-}
 
-/* Tablet - medium size */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .date-field select,
-    .date-field input[type="date"] {
-        height: 42px !important;
-        font-size: 13px !important;
-        padding: 9px 12px !important;
+    .date-field label {
+        font-size: 10px !important;
+        margin-bottom: 4px !important;
     }
+
+    #addBtn {
+        width: 100%; height: 44px;
+        margin-top: 4px; border-radius: 12px;
+    }
+    #taskCount { width: 100%; margin: 0; }
 }
