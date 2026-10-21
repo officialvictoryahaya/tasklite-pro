@@ -3,6 +3,11 @@ const SUPABASE_URL = 'https://zfclurscqotfeekcvhey.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmY2x1cnNjcW90ZmVla2N2aGV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzc5MDksImV4cCI6MjEwNzcxMzkwOX0.yW_i3DD7-mw2p1WmsDIJfw8Uk82dRX_p95F5k5hWy1E'
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+
+
+
+
+
 const $ = id => document.getElementById(id);
 let tasks = JSON.parse(localStorage.getItem('tasklite-pro')||'[]');
 let categories = JSON.parse(localStorage.getItem('tasklite-cats')||'["Work","Personal","Shopping","Study"]');
@@ -54,7 +59,7 @@ function parseTags(text){ return (text.match(/#[\w-]+/g)||[]).map(t=>t.replace('
 function renderCats(){
   $('categoryList').innerHTML=`<button class="cat-btn ${currentCat==='all'?'active':''}" data-cat="all">📥 All Tasks <span>${tasks.length}</span></button>`+categories.map(c=>`<button class="cat-btn ${currentCat===c?'active':''}" data-cat="${c}">${c} <span>${tasks.filter(t=>t.category===c).length}</span></button>`).join('');
   $('catInput').innerHTML=categories.map(c=>`<option>${c}</option>`).join('');
-  document.querySelectorAll('.cat-btn').forEach(b=>b.onclick=()=>{ currentCat=b.dataset.cat; render(); });
+  document.querySelectorAll('.cat-btn').forEach(b=>b.onclick=()=>{ currentCat=b.dataset.cat; render(); if(window.innerWidth<=768){ document.querySelector('.sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); } });
 }
 function renderTags(){
   const all=[...new Set(tasks.flatMap(t=>t.tags))];
@@ -85,7 +90,7 @@ function render(){
       <div class="task-top">
         <input type="checkbox" ${task.completed?'checked':''} onchange="toggleTask('${task.id}')">
         <span class="task-title ${task.completed?'done':''}" onclick="openEdit('${task.id}')">${task.text.replace(/#[\w-]+/g,'')}</span>
-        <button onclick="openEdit('${task.id}')" style="border:none;background:transparent;cursor:pointer;">✏️</button>
+        <button onclick="openEdit('${task.id}')" style="border:none;background:transparent;cursor:pointer;">✏</button>
         <button onclick="deleteTask('${task.id}')" style="border:none;background:transparent;cursor:pointer;">✕</button>
       </div>
       ${task.subtasks&&task.subtasks.length? task.subtasks.map((s,i)=>`<div class="subtask-row"><input type="checkbox" ${s.done?'checked':''} onchange="toggleSubtask('${task.id}',${i})"><span style="${s.done?'text-decoration:line-through;opacity:.6':''}">${s.title}</span><button onclick="removeSubtask('${task.id}',${i})" style="margin-left:auto;border:none;background:transparent;cursor:pointer;">❌</button></div>`).join(''):''}
@@ -110,13 +115,13 @@ async function addTask(){
 }
 window.toggleTask=async id=>{ const t=tasks.find(x=>x.id===id); t.completed=!t.completed; saveLocal(); render(); if(currentUser) await supabaseClient.from('tasks').update({is_completed:t.completed}).eq('id',id); }
 window.deleteTask=async id=>{ tasks=tasks.filter(t=>t.id!==id); saveLocal(); render(); if(currentUser) await supabaseClient.from('tasks').delete().eq('id',id); }
-window.openEdit=id=>{ const t=tasks.find(x=>x.id===id); if(!t) return; editingId=id; tempSubtasks=JSON.parse(JSON.stringify(t.subtasks||[])); $('editTitleInput').value=t.text.replace(/#[\w-]+/g,''); $('editDateInput').value=t.endDate||''; $('editPriorityInput').value=t.priority; renderEditSubtasks(); $('editModal').classList.remove('hidden'); }
-window.renderEditSubtasks=()=>{ $('editSubtasks').innerHTML=tempSubtasks.map((s,i)=>`<div class="subtask-row"><input type="checkbox" ${s.done?'checked':''} onchange="tempSubtasks[${i}].done=!tempSubtasks[${i}].done"><span>${s.title}</span><button onclick="tempSubtasks.splice(${i},1); renderEditSubtasks()" style="margin-left:auto;border:none;background:transparent;">❌</button></div>`).join(''); }
+window.openEdit=id=>{ const t=tasks.find(x=>x.id===id); if(!t) return; editingId=id; tempSubtasks=JSON.parse(JSON.stringify(t.subtasks||[])); const et=$('editTitleInput'); if(et) et.value=t.text.replace(/#[\w-]+/g,''); const ed=$('editDateInput'); if(ed) ed.value=t.endDate||''; const ep=$('editPriorityInput'); if(ep) ep.value=t.priority; renderEditSubtasks(); const em=$('editModal'); if(em) em.classList.remove('hidden'); }
+window.renderEditSubtasks=()=>{ const es=$('editSubtasks'); if(!es) return; es.innerHTML=tempSubtasks.map((s,i)=>`<div class="subtask-row"><input type="checkbox" ${s.done?'checked':''} onchange="tempSubtasks[${i}].done=!tempSubtasks[${i}].done"><span>${s.title}</span><button onclick="tempSubtasks.splice(${i},1); renderEditSubtasks()" style="margin-left:auto;border:none;background:transparent;">❌</button></div>`).join(''); }
 window.addSubtaskInEdit=()=>{ const v=$('newSubtaskInput').value.trim(); if(!v) return; tempSubtasks.push({title:v,done:false}); $('newSubtaskInput').value=''; renderEditSubtasks(); }
 window.toggleSubtask=(tid,idx)=>{ const t=tasks.find(x=>x.id===tid); t.subtasks[idx].done=!t.subtasks[idx].done; saveLocal(); render(); if(currentUser) supabaseClient.from('tasks').update({subtasks:t.subtasks}).eq('id',tid).then(()=>{}); }
 window.removeSubtask=(tid,idx)=>{ const t=tasks.find(x=>x.id===tid); t.subtasks.splice(idx,1); saveLocal(); render(); }
 window.saveEdit=async()=>{ const t=tasks.find(x=>x.id===editingId); t.text=$('editTitleInput').value; t.endDate=$('editDateInput').value||null; t.priority=$('editPriorityInput').value; t.subtasks=tempSubtasks; saveLocal(); closeEdit(); render(); if(currentUser) await supabaseClient.from('tasks').update({title:t.text,due_date:t.endDate,priority:t.priority,subtasks:t.subtasks}).eq('id',editingId); }
-window.closeEdit=()=>{ $('editModal').classList.add('hidden'); editingId=null; }
+window.closeEdit=()=>{ const em=$('editModal'); if(em) em.classList.add('hidden'); editingId=null; }
 
 $('addBtn').onclick=addTask; $('taskInput').addEventListener('keypress',e=>{ if(e.key==='Enter') addTask(); });
 $('searchInput').oninput=render; $('sortInput').onchange=render;
@@ -127,60 +132,20 @@ $('themeBtn').onclick=()=>{ document.body.classList.toggle('dark'); dark=!dark; 
 $('exportBtn').onclick=()=>{ if(!tasks.length) return alert('No tasks'); const data=tasks.map(t=>({Title:t.text,Status:t.completed?'Done':isOverdue(t)?'Overdue':'Pending',Priority:t.priority,Category:t.category,Due:t.endDate||''})); const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Tasks'); XLSX.writeFile(wb,`TaskLite-${new Date().toISOString().split('T')[0]}.xlsx`); }
 
 checkSession(); render();
-if($('exportBtn')) $('exportBtn').onclick = exportTasksToExcel;
 
-checkSession();
-render();
-
-
-// HAMBURGER MENU TOGGLE
-const menuBtn = document.getElementById('menuBtn');
-const sidebar = document.querySelector('.sidebar');
-
-// Create overlay
-const overlay = document.createElement('div');
-overlay.className = 'sidebar-overlay';
-document.body.appendChild(overlay);
-
-if (menuBtn && sidebar) {
-  menuBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('active');
-  });
-
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('active');
-  });
-}
-
-
-
-
-// 
-// ===== MOBILE HAMBURGER MENU - FINAL WORKING =====
+// ===== MOBILE HAMBURGER MENU - WORKING =====
 document.addEventListener('DOMContentLoaded', function() {
   const menuBtn = document.getElementById('menuBtn');
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.getElementById('sidebarOverlay');
-
   if (!menuBtn || !sidebar || !overlay) return;
-
-  menuBtn.addEventListener('click', function() {
+  menuBtn.addEventListener('click', function(e){
+    e.stopPropagation();
     sidebar.classList.toggle('open');
     overlay.classList.toggle('active');
   });
-
-  overlay.addEventListener('click', function() {
+  overlay.addEventListener('click', function(){
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
-  });
-
-  // Close menu when you click a category on phone
-  document.addEventListener('click', function(e) {
-    if (window.innerWidth <= 768 && e.target.classList.contains('cat-btn')) {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('active');
-    }
   });
 });
