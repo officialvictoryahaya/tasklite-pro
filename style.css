@@ -700,55 +700,50 @@ body.dark .task-card.overdue {
 }
 
 /* On phone, make sidebar a hidden slide menu */
+
+
 @media (max-width: 768px) {
   .menu-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 1001;
-    background: #111;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: block !important;
+    position: fixed !important;
+    top: 10px;
+    left: 10px;
+    z-index: 9999 !important;
+    background: #111 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 16px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
   }
 
   .sidebar {
     position: fixed !important;
-    top: 0;
-    left: -100%;
-    width: 82% !important;
-    max-width: 300px;
+    top: 0 !important;
+    left: -100% !important;
+    width: 85% !important;
+    max-width: 300px !important;
     height: 100vh !important;
-    z-index: 1000;
-    background: var(--card);
-    box-shadow: 10px 0 30px rgba(0,0,0,0.2);
-    transition: left 0.3s ease;
-    overflow-y: auto;
+    z-index: 9998 !important;
+    transition: left 0.3s ease !important;
     padding-top: 60px !important;
+    background: var(--card) !important;
   }
 
   .sidebar.open {
     left: 0 !important;
   }
 
-  /* Dark overlay when menu is open */
   .sidebar-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 999;
+    background: rgba(0,0,0,0.45);
+    z-index: 9997;
   }
   .sidebar-overlay.active {
-    display: block;
+    display: block !important;
   }
 
   .main {
