@@ -158,29 +158,29 @@ if (menuBtn && sidebar) {
 
 
 // 
-
-// ===== MOBILE HAMBURGER MENU - FINAL FIX =====
+// ===== MOBILE HAMBURGER MENU - FINAL WORKING =====
 document.addEventListener('DOMContentLoaded', function() {
   const menuBtn = document.getElementById('menuBtn');
   const sidebar = document.querySelector('.sidebar');
   const overlay = document.getElementById('sidebarOverlay');
 
-  console.log('Menu check:', { menuBtn, sidebar, overlay });
+  if (!menuBtn || !sidebar || !overlay) return;
 
-  if (!menuBtn || !sidebar || !overlay) {
-    console.log('Menu elements not found! Make sure you added the button in HTML');
-    return;
-  }
-
-  menuBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
+  menuBtn.addEventListener('click', function() {
     sidebar.classList.toggle('open');
     overlay.classList.toggle('active');
-    console.log('Menu clicked - open:', sidebar.classList.contains('open'));
   });
 
   overlay.addEventListener('click', function() {
     sidebar.classList.remove('open');
     overlay.classList.remove('active');
+  });
+
+  // Close menu when you click a category on phone
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth <= 768 && e.target.classList.contains('cat-btn')) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    }
   });
 });
