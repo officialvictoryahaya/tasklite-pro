@@ -753,3 +753,38 @@ body.dark .task-card.overdue {
     padding: 0 12px !important;
   }
 }
+
+
+
+
+
+/* FIX LOGIN AT BOTTOM BUG */
+#authPage.hidden {
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#appPage {
+  display: none !important;
+}
+
+#appPage.active {
+  display: flex !important;
+  min-height: 100vh;
+}
+
+#authPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+#authPage.hidden {
+  display: none !important;
+}
