@@ -5,9 +5,6 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 
 
-
-
-
 const $ = id => document.getElementById(id);
 let tasks = JSON.parse(localStorage.getItem('tasklite-pro')||'[]');
 let categories = JSON.parse(localStorage.getItem('tasklite-cats')||'["Work","Personal","Shopping","Study"]');
@@ -149,3 +146,4 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.remove('active');
   });
 });
+
