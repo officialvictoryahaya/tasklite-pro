@@ -3,7 +3,6 @@ const SUPABASE_URL = 'https://zfclurscqotfeekcvhey.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmY2x1cnNjcW90ZmVla2N2aGV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMzc5MDksImV4cCI6MjEwNzcxMzkwOX0.yW_i3DD7-mw2p1WmsDIJfw8Uk82dRX_p95F5k5hWy1E'
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-
 const $ = id => document.getElementById(id);
 let tasks = JSON.parse(localStorage.getItem('tasklite-pro')||'[]');
 let categories = JSON.parse(localStorage.getItem('tasklite-cats')||'["Work","Personal","Shopping","Study"]');
@@ -107,7 +106,11 @@ async function addTask(){
   const text=$('taskInput').value.trim(); if(!text) return;
   const task={id:Date.now().toString(),text,completed:false,priority:$('priorityInput').value,startDate:$('startDateInput').value||null,endDate:$('endDateInput').value||null,repeat:$('repeatInput').value,category:$('catInput').value,tags:parseTags(text),subtasks:[],createdAt:Date.now()};
   tasks.unshift(task); saveLocal(); render(); $('taskInput').value='';
-  if(currentUser) await supabaseClient.from('tasks').insert({id:task.id,user_id:currentUser.id,title:task.text,due_date:task.endDate,is_completed:false,priority:task.priority,category:task.category,tags:task.tags,subtasks:task.subtasks,start_date:task.startDate});
+  if(currentUser){
+    const { data, error } = await supabaseClient.from('tasks').insert({user_id:currentUser.id,title:task.text,due_date:task.endDate,is_completed:false,priority:task.priority,category:task.category,tags:task.tags,subtasks:task.subtasks,start_date:task.startDate}).select();
+    if(error){ console.error("Supabase error:", error.message, error); alert("Cloud save failed: "+error.message); }
+    else { console.log("Saved to cloud:", data); if(data && data[0]){ task.id = data[0].id; saveLocal(); } }
+  }
 }
 window.toggleTask=async id=>{ const t=tasks.find(x=>x.id===id); t.completed=!t.completed; saveLocal(); render(); if(currentUser) await supabaseClient.from('tasks').update({is_completed:t.completed}).eq('id',id); }
 window.deleteTask=async id=>{ tasks=tasks.filter(t=>t.id!==id); saveLocal(); render(); if(currentUser) await supabaseClient.from('tasks').delete().eq('id',id); }
@@ -145,4 +148,3 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.remove('active');
   });
 });
-
