@@ -14,6 +14,8 @@ if (typeof window.SUPABASE_ANON_KEY === 'undefined') {
 const SUPABASE_URL = window.SUPABASE_URL;
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
 
+
+
 if (!window.supabaseClient) {
   try {
     window.supabaseClient = supabase.createClient(
@@ -45,7 +47,9 @@ let activeTag = null;
 let currentUser = null;
 let editingId = null;
 let tempSubtasks = [];
-
+let notifiedDueTasks = JSON.parse(
+  localStorage.getItem('tasklite-notified') || '[]'
+);
 let dark = localStorage.getItem('tasklite-dark') === '1';
 
 if (dark) {
@@ -83,6 +87,10 @@ function saveLocal() {
     'tasklite-cats',
     JSON.stringify(categories)
   );
+  localStorage.setItem(
+    'tasklite-notified',
+    JSON.stringify(notifiedDueTasks)
+  );
 }
 
 function isOverdue(t) {
@@ -94,6 +102,151 @@ function isOverdue(t) {
   const due = new Date(t.endDate);
   due.setHours(0, 0, 0, 0);
   return due < today;
+}
+
+function isDueToday(t) {
+  if (t.completed || !t.endDate) {
+    return false;
+  }
+  const todayStr = new Date().toISOString().split('T')[0];
+  return t.endDate === todayStr;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) {
+    return '';
+  }
+  const d = new Date(dateStr);
+  return d.toLocaleDateString(
+    'en-US',
+    {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }
+  );
+}
+
+function getNextRepeatDate(dateStr, repeatType) {
+  if (!dateStr || repeatType === 'none') {
+    return null;
+  }
+  const d = new Date(dateStr);
+  if (repeatType === 'daily') {
+    d.setDate(d.getDate() + 1);
+  }
+  if (repeatType === 'weekly') {
+    d.setDate(d.getDate() + 7);
+  }
+  if (repeatType === 'monthly') {
+    d.setMonth(d.getMonth() + 1);
+  }
+  return d.toISOString().split('T')[0];
+}
+
+function showToast(message) {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#111; color:#fff; padding:12px 18px; border-radius:10px; z-index:99999; font-size:13px; font-weight:600;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.display = 'block';
+  setTimeout(function() {
+    toast.style.display = 'none';
+  }, 4000);
+}
+
+async function sendDueEmail(task) {
+  if (!currentUser || !currentUser.email) {
+    return;
+  }
+  const taskId = task.id + '_' + task.endDate;
+  if (notifiedDueTasks.indexOf(taskId) !== -1) {
+    return;
+  }
+
+  // Try Supabase Edge Function
+  try {
+    await supabaseClient.functions.invoke(
+      'send-due-email',
+      {
+        body: {
+          to: currentUser.email,
+          taskTitle: cleanTitle(task.text),
+          dueDate: task.endDate,
+          startDate: task.startDate,
+          priority: task.priority,
+          category: task.category,
+          repeat: task.repeat
+        }
+      }
+    );
+  } catch (err) {
+    console.log('Email edge function not deployed yet, using notification');
+    if (Notification && Notification.permission === 'granted') {
+      new Notification(
+        'Task Due: ' + cleanTitle(task.text),
+        {
+          body: 'Due on ' + formatDate(task.endDate)
+        }
+      );
+    }
+  }
+
+  notifiedDueTasks.push(taskId);
+  saveLocal();
+  showToast(
+    '📧 Due: ' + cleanTitle(task.text) + ' → ' + currentUser.email
+  );
+}
+
+function checkAndNotifyDueTasks() {
+  if (!currentUser) {
+    return;
+  }
+  tasks.forEach(function(task) {
+    if (task.completed) {
+      return;
+    }
+    if (isOverdue(task) || isDueToday(task)) {
+      sendDueEmail(task);
+    }
+    if (isOverdue(task) && task.repeat && task.repeat !== 'none') {
+      const nextDate = getNextRepeatDate(
+        task.endDate,
+        task.repeat
+      );
+      if (nextDate) {
+        const exists = tasks.some(function(t) {
+          return t.text === task.text && t.endDate === nextDate;
+        });
+        if (!exists) {
+          const newTask = {
+            id: Date.now().toString() + Math.random().toString().slice(2, 6),
+            text: task.text,
+            completed: false,
+            priority: task.priority,
+            startDate: task.startDate ? getNextRepeatDate(task.startDate, task.repeat) : null,
+            endDate: nextDate,
+            repeat: task.repeat,
+            category: task.category,
+            tags: task.tags,
+            subtasks: [],
+            createdAt: Date.now()
+          };
+          tasks.unshift(newTask);
+          saveLocal();
+          showToast(
+            '🔁 Repeated: ' + cleanTitle(newTask.text) + ' for ' + formatDate(nextDate)
+          );
+        }
+      }
+    }
+  });
+  render();
 }
 
 window.showDashboard = function(user) {
@@ -120,7 +273,11 @@ window.showDashboard = function(user) {
     av.src = avatarUrl;
     av.style.display = 'block';
   }
+  if (Notification && Notification.permission !== 'granted') {
+    Notification.requestPermission();
+  }
   loadFromCloud();
+  setTimeout(checkAndNotifyDueTasks, 2000);
 };
 
 window.showLogin = function() {
@@ -287,7 +444,7 @@ async function loadFromCloud() {
           priority: t.priority || 'medium',
           startDate: t.start_date || null,
           endDate: t.due_date || null,
-          repeat: 'none',
+          repeat: t.repeat || 'none',
           category: t.category || 'Personal',
           tags: t.tags || [],
           subtasks: t.subtasks || [],
@@ -296,6 +453,7 @@ async function loadFromCloud() {
       });
       saveLocal();
       render();
+      checkAndNotifyDueTasks();
     }
   } catch (e) {
     console.log(e);
@@ -431,8 +589,29 @@ function render() {
   }
   filtered.forEach(function(task) {
     const overdue = isOverdue(task);
+    const dueToday = isDueToday(task);
     const li = document.createElement('li');
     li.className = 'task-card ' + task.priority + ' ' + (overdue ? 'overdue' : '');
+
+    let dateBadges = '';
+    if (task.startDate) {
+      const cls = overdue ? 'overdue-badge' : '';
+      dateBadges += '<span class="badge date-badge ' + cls + '">📅 Start: ' + formatDate(task.startDate) + '</span>';
+    }
+    if (task.endDate) {
+      let cls = 'date-badge';
+      if (overdue) {
+        cls += ' overdue-badge';
+      } else if (dueToday) {
+        cls += ' due-today';
+      }
+      const icon = overdue ? '🔴' : dueToday ? '🟡' : '📅';
+      dateBadges += '<span class="badge ' + cls + '">' + icon + ' Due: ' + formatDate(task.endDate) + '</span>';
+    }
+    if (task.repeat && task.repeat !== 'none') {
+      dateBadges += '<span class="badge repeat-badge">🔁 ' + task.repeat + '</span>';
+    }
+
     let subHtml = '';
     if (task.subtasks && task.subtasks.length) {
       for (let i = 0; i < task.subtasks.length; i++) {
@@ -440,9 +619,12 @@ function render() {
         subHtml += '<div class="subtask-row"><input type="checkbox" ' + (s.done ? 'checked' : '') + ' onchange="toggleSubtask(\'' + task.id + '\',' + i + ')"><span>' + s.title + '</span></div>';
       }
     }
-    li.innerHTML = '<div class="task-top"><input type="checkbox" ' + (task.completed ? 'checked' : '') + ' onchange="toggleTask(\'' + task.id + '\')"><span class="task-title ' + (task.completed ? 'done' : '') + '" onclick="openEdit(\'' + task.id + '\')">' + cleanTitle(task.text) + '</span><button onclick="openEdit(\'' + task.id + '\')" style="border:none; background:transparent; cursor:pointer">✏️</button><button onclick="deleteTask(\'' + task.id + '\')" style="border:none; background:transparent; cursor:pointer">✕</button></div>' + subHtml + '<div class="meta"><span class="badge">' + task.priority + '</span><span class="badge">' + task.category + '</span></div>';
+
+    li.innerHTML = '<div class="task-top"><input type="checkbox" ' + (task.completed ? 'checked' : '') + ' onchange="toggleTask(\'' + task.id + '\')"><span class="task-title ' + (task.completed ? 'done' : '') + '" onclick="openEdit(\'' + task.id + '\')">' + cleanTitle(task.text) + '</span><button onclick="openEdit(\'' + task.id + '\')" style="border:none; background:transparent; cursor:pointer">✏️</button><button onclick="deleteTask(\'' + task.id + '\')" style="border:none; background:transparent; cursor:pointer">✕</button></div>' + subHtml + '<div class="meta"><span class="badge">' + task.priority + '</span><span class="badge">' + task.category + '</span>' + dateBadges + '</div>';
+
     taskList.appendChild(li);
   });
+
   const taskCount = $('taskCount');
   if (taskCount) {
     taskCount.textContent = filtered.length + ' tasks';
@@ -462,6 +644,7 @@ async function addTask() {
   const prioEl = $('priorityInput');
   const startEl = $('startDateInput');
   const endEl = $('endDateInput');
+  const repeatEl = $('repeatInput');
   const catEl = $('catInput');
   const task = {
     id: Date.now().toString(),
@@ -470,6 +653,7 @@ async function addTask() {
     priority: prioEl ? prioEl.value : 'medium',
     startDate: startEl ? startEl.value : null,
     endDate: endEl ? endEl.value : null,
+    repeat: repeatEl ? repeatEl.value : 'none',
     category: catEl ? catEl.value : 'Personal',
     tags: tags,
     subtasks: [],
@@ -492,7 +676,8 @@ async function addTask() {
           category: task.category,
           tags: task.tags,
           subtasks: task.subtasks,
-          start_date: task.startDate
+          start_date: task.startDate,
+          repeat: task.repeat
         })
         .select();
       if (result.data && result.data[0]) {
@@ -522,6 +707,33 @@ window.toggleTask = async function(id) {
         })
         .eq('id', id);
     } catch (e) {}
+  }
+  if (t.completed && t.repeat && t.repeat !== 'none') {
+    const nextDate = getNextRepeatDate(
+      t.endDate,
+      t.repeat
+    );
+    if (nextDate) {
+      const newTask = {
+        id: Date.now().toString(),
+        text: t.text,
+        completed: false,
+        priority: t.priority,
+        startDate: t.startDate ? getNextRepeatDate(t.startDate, t.repeat) : null,
+        endDate: nextDate,
+        repeat: t.repeat,
+        category: t.category,
+        tags: t.tags,
+        subtasks: [],
+        createdAt: Date.now()
+      };
+      tasks.unshift(newTask);
+      saveLocal();
+      render();
+      showToast(
+        '🔁 Next ' + t.repeat + ' created for ' + formatDate(nextDate)
+      );
+    }
   }
 };
 
@@ -566,6 +778,7 @@ window.openEdit = function(id) {
   if (em) {
     em.classList.remove('hidden');
   }
+  renderEditSubtasks();
 };
 
 window.closeEdit = function() {
@@ -654,38 +867,6 @@ window.toggleSubtask = async function(tid, idx) {
   t.subtasks[idx].done = !t.subtasks[idx].done;
   saveLocal();
   render();
-  if (currentUser && supabaseClient) {
-    try {
-      await supabaseClient
-        .from('tasks')
-        .update({
-          subtasks: t.subtasks
-        })
-        .eq('id', tid);
-    } catch (e) {}
-  }
-};
-
-window.removeSubtask = async function(tid, idx) {
-  const t = tasks.find(function(x) {
-    return x.id === tid;
-  });
-  if (!t) {
-    return;
-  }
-  t.subtasks.splice(idx, 1);
-  saveLocal();
-  render();
-  if (currentUser && supabaseClient) {
-    try {
-      await supabaseClient
-        .from('tasks')
-        .update({
-          subtasks: t.subtasks
-        })
-        .eq('id', tid);
-    } catch (e) {}
-  }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -765,7 +946,9 @@ document.addEventListener('DOMContentLoaded', function() {
           Status: t.completed ? 'Done' : 'Pending',
           Priority: t.priority,
           Category: t.category,
-          Due: t.endDate || ''
+          Start: t.startDate || '',
+          Due: t.endDate || '',
+          Repeat: t.repeat || 'none'
         };
       });
       const ws = XLSX.utils.json_to_sheet(data);
@@ -795,4 +978,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   checkSession();
   render();
+  setInterval(function() {
+    checkAndNotifyDueTasks();
+  }, 60000);
 });
