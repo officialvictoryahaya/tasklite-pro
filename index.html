@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TaskLite Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=101">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -18,7 +18,9 @@
         </div>
     </div>
     <div class="auth-card">
-        <div class="auth-logo"><span class="dot"></span> TaskLite Pro</div>
+        <div class="auth-logo">
+            <span class="dot"></span> TaskLite Pro
+        </div>
         <p class="auth-subtitle">Clarity for your daily work</p>
         <input id="email" type="email" placeholder="Email address">
         <input id="password" type="password" placeholder="Password (min 6 chars)">
@@ -73,16 +75,40 @@
                 <option value="priority">Priority</option>
                 <option value="alpha">A-Z</option>
             </select>
-            <button id="exportBtn" style="background:#111; color:white; padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:600;">📊 Export</button>
+            <button id="exportBtn">📊 Export</button>
         </header>
         <div class="composer">
             <input id="taskInput" placeholder="What needs to be done? Use #tag for tags">
             <div class="composer-row">
-                <div class="date-field"><label>Priority</label><select id="priorityInput"><option value="low">🟢 Low</option><option value="medium" selected>🟡 Medium</option><option value="high">🔴 High</option></select></div>
-                <div class="date-field"><label>Start date</label><input type="date" id="startDateInput"></div>
-                <div class="date-field"><label>Due date</label><input type="date" id="endDateInput"></div>
-                <div class="date-field"><label>Repeat</label><select id="repeatInput"><option value="none">No Repeat</option><option value="daily">🔁 Daily</option><option value="weekly">🔁 Weekly</option><option value="monthly">🔁 Monthly</option></select></div>
-                <div class="date-field"><label>Task categories</label><select id="catInput"></select></div>
+                <div class="date-field">
+                    <label>Priority</label>
+                    <select id="priorityInput">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                </div>
+                <div class="date-field">
+                    <label>Start date</label>
+                    <input type="date" id="startDateInput">
+                </div>
+                <div class="date-field">
+                    <label>Due date</label>
+                    <input type="date" id="endDateInput">
+                </div>
+                <div class="date-field">
+                    <label>Repeat</label>
+                    <select id="repeatInput">
+                        <option value="none">No Repeat</option>
+                        <option value="daily">🔁 Daily</option>
+                        <option value="weekly">🔁 Weekly</option>
+                        <option value="monthly">🔁 Monthly</option>
+                    </select>
+                </div>
+                <div class="date-field">
+                    <label>Task categories</label>
+                    <select id="catInput"></select>
+                </div>
                 <button id="addBtn">Add Task</button>
             </div>
         </div>
@@ -97,152 +123,39 @@
     </main>
 </div>
 
-<!-- EDIT MODAL - THIS WAS MISSING BEFORE - NOW FIXED -->
+<!-- EDIT MODAL -->
 <div id="editModal" class="modal hidden">
     <div class="modal-card">
         <h3 style="margin-bottom:12px">Edit Task</h3>
-        <label style="font-size:11px;font-weight:700;color:var(--text2)">TASK TITLE (use #tag for tags)</label>
-        <input id="editTitleInput" placeholder="Task title - e.g. Buy milk #shopping" style="width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);margin:6px 0 12px">
-        <div style="display:flex;gap:10px;margin-bottom:12px">
-            <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--text2)">DUE DATE</label><input type="date" id="editDateInput" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);margin-top:4px"></div>
-            <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--text2)">PRIORITY</label><select id="editPriorityInput" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);margin-top:4px"><option value="low">🟢 Low</option><option value="medium">🟡 Medium</option><option value="high">🔴 High</option></select></div>
+        <label style="font-size:11px; font-weight:700; color:var(--text2)">TASK TITLE (use #tag for tags)</label>
+        <input id="editTitleInput" placeholder="Task title - e.g. Buy milk #shopping" style="width:100%; padding:12px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); margin:6px 0 12px">
+        <div style="display:flex; gap:10px; margin-bottom:12px">
+            <div style="flex:1">
+                <label style="font-size:11px; font-weight:700; color:var(--text2)">DUE DATE</label>
+                <input type="date" id="editDateInput" style="width:100%; padding:10px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); margin-top:4px">
+            </div>
+            <div style="flex:1">
+                <label style="font-size:11px; font-weight:700; color:var(--text2)">PRIORITY</label>
+                <select id="editPriorityInput" style="width:100%; padding:10px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg); margin-top:4px">
+                    <option value="low">🟢 Low</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="high">🔴 High</option>
+                </select>
+            </div>
         </div>
-        <p style="font-size:13px;font-weight:700;margin:14px 0 8px">Subtasks</p>
-        <div id="editSubtasks" style="max-height:180px;overflow-y:auto"></div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-            <input id="newSubtaskInput" placeholder="New subtask..." style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg)">
-            <button onclick="addSubtaskInEdit()" style="padding:10px 16px;border-radius:10px;background:var(--text);color:var(--bg);border:none;font-weight:600;cursor:pointer">+ Add</button>
+        <p style="font-size:13px; font-weight:700; margin:14px 0 8px">Subtasks</p>
+        <div id="editSubtasks" style="max-height:180px; overflow-y:auto"></div>
+        <div style="display:flex; gap:8px; margin-top:10px">
+            <input id="newSubtaskInput" placeholder="New subtask..." style="flex:1; padding:10px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg)">
+            <button onclick="addSubtaskInEdit()" style="padding:10px 16px; border-radius:10px; background:var(--text); color:var(--bg); border:none; font-weight:600; cursor:pointer">+ Add</button>
         </div>
-        <div style="display:flex;gap:10px;margin-top:18px">
-            <button onclick="saveEdit()" style="flex:1;padding:12px;border-radius:12px;background:var(--text);color:var(--bg);border:none;font-weight:700;cursor:pointer">Save Changes</button>
-            <button onclick="closeEdit()" style="flex:1;padding:12px;border-radius:12px;background:var(--card2);border:1px solid var(--border);font-weight:600;cursor:pointer">Cancel</button>
+        <div style="display:flex; gap:10px; margin-top:18px">
+            <button onclick="saveEdit()" style="flex:1; padding:12px; border-radius:12px; background:var(--text); color:var(--bg); border:none; font-weight:700; cursor:pointer">Save Changes</button>
+            <button onclick="closeEdit()" style="flex:1; padding:12px; border-radius:12px; background:var(--card2); border:1px solid var(--border); font-weight:600; cursor:pointer">Cancel</button>
         </div>
     </div>
 </div>
 
-<script src="script.js"></script>
+<script src="script.js?v=101"></script>
 </body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskLite Pro</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-</head>
-<body>
-
-<div id="authPage">
-    <div id="loadingOverlay">
-        <div class="spinner-box">
-            <div class="spinner"></div>
-            <p>Connecting to Google...</p>
-        </div>
-    </div>
-    <div class="auth-card">
-        <div class="auth-logo"><span class="dot"></span> TaskLite Pro</div>
-        <p class="auth-subtitle">Clarity for your daily work</p>
-        <input id="email" type="email" placeholder="Email address">
-        <input id="password" type="password" placeholder="Password (min 6 chars)">
-        <button class="auth-btn-primary" onclick="signIn()">Sign In</button>
-        <button class="auth-btn-secondary" onclick="signUp()">Create Account</button>
-        <div class="auth-divider">or continue with</div>
-        <button class="auth-btn-google" onclick="signInWithGoogle()">
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18"> Continue with Google
-        </button>
-        <div id="authError" class="auth-error"></div>
-    </div>
-</div>
-
-<div id="appPage" class="app">
-    <button id="menuBtn" class="menu-btn">☰ Menu</button>
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-    <aside class="sidebar">
-        <div class="logo"><span class="dot"></span> TaskLite Pro</div>
-        <div class="side-section">
-            <p class="side-label">TASK CATEGORIES</p>
-            <div id="categoryList"></div>
-            <div class="add-cat-row">
-                <input id="newCatInput" placeholder="New list...">
-                <button id="addCatBtn">Add</button>
-            </div>
-        </div>
-        <div class="side-section">
-            <p class="side-label">TAGS</p>
-            <div id="tagList"></div>
-        </div>
-        <div class="side-bottom">
-            <div class="user-box" id="userBox">
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                    <img id="userAvatar" src="" alt="" style="width:36px; height:36px; border-radius:50%; display:none; object-fit:cover; border:1px solid var(--border)" referrerpolicy="no-referrer">
-                    <div>
-                        <p id="userNameDisplay" style="font-weight:700; font-size:14px"></p>
-                        <p id="userEmailDisplay"></p>
-                    </div>
-                </div>
-                <button onclick="signOut()" class="logout-btn">Logout</button>
-            </div>
-            <button id="themeBtn">🌙 Dark Mode</button>
-            <p class="hint">N = new task<br>/ = search<br>Esc = clear</p>
-        </div>
-    </aside>
-    <main class="main">
-        <header class="topbar">
-            <input id="searchInput" placeholder="Search tasks, #tags, category...">
-            <select id="sortInput">
-                <option value="order">Manual ↕ Drag</option>
-                <option value="endDate">End Date</option>
-                <option value="priority">Priority</option>
-                <option value="alpha">A-Z</option>
-            </select>
-            <button id="exportBtn" style="background:#111; color:white; padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:600;">📊 Export</button>
-        </header>
-        <div class="composer">
-            <input id="taskInput" placeholder="What needs to be done? Use #tag for tags">
-            <div class="composer-row">
-                <div class="date-field"><label>Priority</label><select id="priorityInput"><option value="low">🟢 Low</option><option value="medium" selected>🟡 Medium</option><option value="high">🔴 High</option></select></div>
-                <div class="date-field"><label>Start date</label><input type="date" id="startDateInput"></div>
-                <div class="date-field"><label>Due date</label><input type="date" id="endDateInput"></div>
-                <div class="date-field"><label>Repeat</label><select id="repeatInput"><option value="none">No Repeat</option><option value="daily">🔁 Daily</option><option value="weekly">🔁 Weekly</option><option value="monthly">🔁 Monthly</option></select></div>
-                <div class="date-field"><label>Task categories</label><select id="catInput"></select></div>
-                <button id="addBtn">Add Task</button>
-            </div>
-        </div>
-        <div class="filters">
-            <button data-filter="all" class="filter-btn active">All</button>
-            <button data-filter="active" class="filter-btn">Pending</button>
-            <button data-filter="done" class="filter-btn">Done</button>
-            <span id="taskCount"></span>
-            <button id="clearBtn">Clear Done</button>
-        </div>
-        <ul id="taskList"></ul>
-    </main>
-</div>
-
-<!-- EDIT MODAL - THIS WAS MISSING BEFORE - NOW FIXED -->
-<div id="editModal" class="modal hidden">
-    <div class="modal-card">
-        <h3 style="margin-bottom:12px">Edit Task</h3>
-        <label style="font-size:11px;font-weight:700;color:var(--text2)">TASK TITLE (use #tag for tags)</label>
-        <input id="editTitleInput" placeholder="Task title - e.g. Buy milk #shopping" style="width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);margin:6px 0 12px">
-        <div style="display:flex;gap:10px;margin-bottom:12px">
-            <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--text2)">DUE DATE</label><input type="date" id="editDateInput" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);margin-top:4px"></div>
-            <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--text2)">PRIORITY</label><select id="editPriorityInput" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);margin-top:4px"><option value="low">🟢 Low</option><option value="medium">🟡 Medium</option><option value="high">🔴 High</option></select></div>
-        </div>
-        <p style="font-size:13px;font-weight:700;margin:14px 0 8px">Subtasks</p>
-        <div id="editSubtasks" style="max-height:180px;overflow-y:auto"></div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-            <input id="newSubtaskInput" placeholder="New subtask..." style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg)">
-            <button onclick="addSubtaskInEdit()" style="padding:10px 16px;border-radius:10px;background:var(--text);color:var(--bg);border:none;font-weight:600;cursor:pointer">+ Add</button>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:18px">
-            <button onclick="saveEdit()" style="flex:1;padding:12px;border-radius:12px;background:var(--text);color:var(--bg);border:none;font-weight:700;cursor:pointer">Save Changes</button>
-            <button onclick="closeEdit()" style="flex:1;padding:12px;border-radius:12px;background:var(--card2);border:1px solid var(--border);font-weight:600;cursor:pointer">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<script src="script.js?v=999"></script></body>
 </html>
