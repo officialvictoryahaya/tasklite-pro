@@ -95,12 +95,24 @@ function showToast(message) {
   setTimeout(function(){ toast.style.display='none'; }, 5000);
 }
 async function sendTaskEmail(type, task) {
-  if (!currentUser || !currentUser.email) return;
+  if (!currentUser || !currentUser.email) {
+    console.log('No user email, skip email');
+    return;
+  }
   const key = task.id + '_' + type + '_' + task.endDate;
-  if (notifiedDueTasks.indexOf(key) !== -1) return;
+  if (notifiedDueTasks.indexOf(key) !== -1) {
+    console.log('Already notified', key);
+    return;
+  }
   try {
-    const result = await supabaseClient.functions.invoke('send-task-email', {
-      body: {
+    console.log('Sending email:', type, task.text);
+    const res = await fetch(SUPABASE_URL + '/functions/v1/send-task-email', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         to: currentUser.email,
         type: type,
         taskTitle: cleanTitle(task.text),
@@ -109,20 +121,21 @@ async function sendTaskEmail(type, task) {
         priority: task.priority,
         category: task.category,
         repeat: task.repeat
-      }
+      })
     });
-    console.log('Email sent:', type, result);
-    notifiedDueTasks.push(key);
-    saveLocal();
-    if (type === 'created') showToast('✅ Email sent: Task Created → ' + currentUser.email);
-    if (type === 'reminder') showToast('⏰ Reminder sent → ' + currentUser.email);
-    if (type === 'due') showToast('🔴 Due Today email sent → ' + currentUser.email);
-    if (type === 'overdue') showToast('🚨 Overdue email sent → ' + currentUser.email);
-  } catch (err) {
-    console.log('Email error, fallback notification', err.message);
-    if (Notification && Notification.permission === 'granted') {
-      new Notification('TaskLite: ' + type, { body: cleanTitle(task.text) + ' - ' + formatDate(task.endDate) });
+    const data = await res.json();
+    console.log('Email result:', data);
+    if (data.success || res.ok) {
+      notifiedDueTasks.push(key);
+      saveLocal();
+      showToast('✅ Email sent: ' + type + ' → ' + currentUser.email);
+    } else {
+      console.log('Email failed', data);
+      showToast('❌ Email failed: ' + (data.error || 'check logs'));
     }
+  } catch (err) {
+    console.log('Email error', err.message);
+    showToast('❌ Email error: ' + err.message);
   }
 }
 function checkAndNotifyDueTasks() {
