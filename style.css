@@ -854,6 +854,16 @@ body.dark .task-card.overdue {
 
 
 
+   /* Universal iPhone Modal Fix */
+@media (max-width: 600px) {
+  div[style*="Edit Task"] { width: 90% !important; }
+  /* Force due date and priority to stack */
+  div:has(> div > input[value*="Oct"]) {
+    flex-direction: column !important;
+  }
+}
+
+
   #taskCount {
     width: 100%;
     margin: 0;
