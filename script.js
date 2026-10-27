@@ -19,6 +19,12 @@ const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
 
 
 
+
+
+
+
+
+
 if (!window.supabaseClient) {
   try {
     window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -156,24 +162,6 @@ function checkAndNotifyDueTasks() {
     if (isDueTomorrow(task)) { sendTaskEmail('reminder', task); }
     if (isDueToday(task)) { sendTaskEmail('due', task); }
     if (isOverdue(task)) { sendTaskEmail('overdue', task); }
-    if (isOverdue(task) && task.repeat && task.repeat !== 'none') {
-      const nextDate = getNextRepeatDate(task.endDate, task.repeat);
-      if (nextDate) {
-        const exists = tasks.some(function(t){ return t.text === task.text && t.endDate === nextDate; });
-        if (!exists) {
-          const newTask = {
-            id: Date.now().toString() + Math.random().toString().slice(2,6),
-            text: task.text, completed: false, priority: task.priority,
-            startDate: task.startDate ? getNextRepeatDate(task.startDate, task.repeat) : null,
-            endDate: nextDate, repeat: task.repeat, category: task.category,
-            tags: task.tags, subtasks: [], createdAt: Date.now()
-          };
-          tasks.unshift(newTask);
-          saveLocal();
-          showToast('🔁 Repeated task created for ' + formatDate(nextDate));
-        }
-      }
-    }
   });
   render();
 }
@@ -191,7 +179,6 @@ window.showDashboard = function(user) {
     const avatarUrl = meta.avatar_url || meta.picture || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fullName) + '&background=111827&color=fff&bold=true';
     av.src = avatarUrl; av.style.display = 'block';
   }
-  if (Notification && Notification.permission !== 'granted') { Notification.requestPermission(); }
   loadFromCloud();
   setTimeout(checkAndNotifyDueTasks, 2000);
 };
@@ -218,25 +205,59 @@ window.signUp = async function() {
 window.signInWithGoogle = async function() {
   const loader=$('loadingOverlay'); if(loader) loader.classList.add('active');
   try{ 
+    console.log('iPhone Google login starting...');
     const result=await supabaseClient.auth.signInWithOAuth({
       provider:'google',
       options:{
-        redirectTo: window.location.origin,
-        queryParams: { prompt: 'select_account' }
+        redirectTo: window.location.origin + '/',
+        queryParams: { prompt: 'select_account', access_type: 'offline' }
       }
     }); 
-    if(result.error){ if(loader) loader.classList.remove('active'); const errEl=$('authError'); if(errEl) errEl.textContent=result.error.message; } 
-  }catch(err){ if(loader) loader.classList.remove('active'); }
+    if(result.error){ 
+      if(loader) loader.classList.remove('active'); 
+      const errEl=$('authError'); 
+      if(errEl) errEl.textContent=result.error.message; 
+      console.log('Google OAuth error:', result.error);
+    } 
+  }catch(err){ 
+    if(loader) loader.classList.remove('active');
+    console.log('Google login exception:', err);
+  }
 };
 window.signOut = async function(){ try{ await supabaseClient.auth.signOut(); }catch(e){} window.showLogin(); };
+
 async function checkSession() {
   if(!supabaseClient){ window.showLogin(); return; }
   try{
+    const url = new URL(window.location.href);
+    console.log('checkSession URL:', window.location.href);
+    
+    if (url.searchParams.has('code')) {
+      console.log('iPhone: Found ?code= in URL, exchanging for session...');
+      const { data, error } = await supabaseClient.auth.exchangeCodeForSession(window.location.href);
+      if (error) {
+        console.log('exchangeCodeForSession error:', error.message);
+      } else {
+        console.log('exchangeCodeForSession success:', data.session?.user?.email);
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const result=await supabaseClient.auth.getSession();
+    console.log('getSession:', result.data.session ? 'Logged in as ' + result.data.session.user.email : 'No session');
     if(result.data && result.data.session) window.showDashboard(result.data.session.user); else window.showLogin();
-    supabaseClient.auth.onAuthStateChange(function(ev,sess){ const loader=$('loadingOverlay'); if(loader) loader.classList.remove('active'); if(sess && sess.user) window.showDashboard(sess.user); else window.showLogin(); });
-  }catch(e){ window.showLogin(); }
+    
+    supabaseClient.auth.onAuthStateChange(function(ev,sess){ 
+      console.log('onAuthStateChange:', ev, sess?.user?.email);
+      const loader=$('loadingOverlay'); if(loader) loader.classList.remove('active'); 
+      if(sess && sess.user) window.showDashboard(sess.user); else window.showLogin(); 
+    });
+  }catch(e){ 
+    console.log('checkSession error:', e);
+    window.showLogin(); 
+  }
 }
+
 async function loadFromCloud() {
   if(!currentUser||!supabaseClient) return;
   try{
@@ -289,8 +310,8 @@ function render() {
     if(task.startDate){ const cls=overdue?'overdue-badge':''; dateBadges+='<span class="badge date-badge '+cls+'">📅 Start: '+formatDate(task.startDate)+'</span>'; }
     if(task.endDate){ let cls='date-badge'; if(overdue) cls+=' overdue-badge'; else if(dueToday) cls+=' due-today'; else if(dueTomorrow) cls+=' due-today'; const icon=overdue?'🔴':dueToday?'🟡':dueTomorrow?'⏰':'📅'; dateBadges+='<span class="badge '+cls+'">'+icon+' Due: '+formatDate(task.endDate)+'</span>'; }
     if(task.repeat && task.repeat!=='none'){ dateBadges+='<span class="badge repeat-badge">🔁 '+task.repeat+'</span>'; }
-    let subHtml=''; if(task.subtasks&&task.subtasks.length){ for(let i=0;i<task.subtasks.length;i++){ const s=task.subtasks[i]; subHtml+='<div class="subtask-row"><input type="checkbox" '+(s.done?'checked':'')+' onchange="toggleSubtask(\''+task.id+'\','+i+')"><span>'+s.title+'</span></div>'; } }
-    li.innerHTML='<div class="task-top"><input type="checkbox" '+(task.completed?'checked':'')+' onchange="toggleTask(\''+task.id+'\')"><span class="task-title '+(task.completed?'done':'')+'" onclick="openEdit(\''+task.id+'\')">'+cleanTitle(task.text)+'</span><button onclick="openEdit(\''+task.id+'\')" style="border:none;background:transparent;cursor:pointer">✏</button><button onclick="deleteTask(\''+task.id+'\')" style="border:none;background:transparent;cursor:pointer">✕</button></div>'+subHtml+'<div class="meta"><span class="badge">'+task.priority+'</span><span class="badge">'+task.category+'</span>'+dateBadges+'</div>';
+    let subHtml=''; if(task.subtasks&&task.subtasks.length){ for(let i=0;i<task.subtasks.length;i++){ const s=task.subtasks[i]; subHtml+='<div class="subtask-row"><input type="checkbox" '+(s.done?'checked':'')+' onchange="toggleSubtask(''+task.id+'','+i+')"><span>'+s.title+'</span></div>'; } }
+    li.innerHTML='<div class="task-top"><input type="checkbox" '+(task.completed?'checked':'')+' onchange="toggleTask(''+task.id+'')"><span class="task-title '+(task.completed?'done':'')+'" onclick="openEdit(''+task.id+'')">'+cleanTitle(task.text)+'</span><button onclick="openEdit(''+task.id+'')" style="border:none;background:transparent;cursor:pointer">✏</button><button onclick="deleteTask(''+task.id+'')" style="border:none;background:transparent;cursor:pointer">✕</button></div>'+subHtml+'<div class="meta"><span class="badge">'+task.priority+'</span><span class="badge">'+task.category+'</span>'+dateBadges+'</div>';
     taskList.appendChild(li);
   });
   const taskCount=$('taskCount'); if(taskCount) taskCount.textContent=filtered.length+' tasks';
@@ -337,13 +358,6 @@ async function addTask() {
 window.toggleTask=async function(id){
   const t=tasks.find(function(x){return x.id===id;}); if(!t) return; t.completed=!t.completed; saveLocal(); render();
   if(currentUser&&supabaseClient){ try{ await supabaseClient.from('tasks').update({is_completed:t.completed}).eq('id',id); }catch(e){} }
-  if(t.completed && t.repeat && t.repeat!=='none'){
-    const nextDate=getNextRepeatDate(t.endDate, t.repeat);
-    if(nextDate){
-      const newTask={ id:Date.now().toString(), text:t.text, completed:false, priority:t.priority, startDate:t.startDate?getNextRepeatDate(t.startDate,t.repeat):null, endDate:nextDate, repeat:t.repeat, category:t.category, tags:t.tags, subtasks:[], createdAt:Date.now(), user_email: currentUser ? currentUser.email : null };
-      tasks.unshift(newTask); saveLocal(); render(); showToast('🔁 Next '+t.repeat+' created for '+formatDate(nextDate)); sendTaskEmail('created', newTask);
-    }
-  }
 };
 window.deleteTask=async function(id){ tasks=tasks.filter(function(t){return t.id!==id;}); saveLocal(); render(); if(currentUser&&supabaseClient){ try{ await supabaseClient.from('tasks').delete().eq('id',id); }catch(e){} } };
 window.openEdit=function(id){ const t=tasks.find(function(x){return x.id===id;}); if(!t) return; editingId=id; tempSubtasks=JSON.parse(JSON.stringify(t.subtasks||[])); const ti=$('editTitleInput'); const di=$('editDateInput'); const pi=$('editPriorityInput'); if(ti) ti.value=t.text; if(di) di.value=t.endDate||''; if(pi) pi.value=t.priority; const em=$('editModal'); if(em) em.classList.remove('hidden'); renderEditSubtasks(); };
