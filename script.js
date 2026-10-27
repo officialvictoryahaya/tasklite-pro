@@ -16,9 +16,20 @@ const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
 
 
 
+
+
+
 if (!window.supabaseClient) {
   try {
-    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+        storage: window.localStorage
+      }
+    });
   } catch (e) { console.error(e); }
 }
 const supabaseClient = window.supabaseClient;
@@ -206,7 +217,16 @@ window.signUp = async function() {
 };
 window.signInWithGoogle = async function() {
   const loader=$('loadingOverlay'); if(loader) loader.classList.add('active');
-  try{ const result=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}}); if(result.error){ if(loader) loader.classList.remove('active'); const errEl=$('authError'); if(errEl) errEl.textContent=result.error.message; } }catch(err){ if(loader) loader.classList.remove('active'); }
+  try{ 
+    const result=await supabaseClient.auth.signInWithOAuth({
+      provider:'google',
+      options:{
+        redirectTo: window.location.origin,
+        queryParams: { prompt: 'select_account' }
+      }
+    }); 
+    if(result.error){ if(loader) loader.classList.remove('active'); const errEl=$('authError'); if(errEl) errEl.textContent=result.error.message; } 
+  }catch(err){ if(loader) loader.classList.remove('active'); }
 };
 window.signOut = async function(){ try{ await supabaseClient.auth.signOut(); }catch(e){} window.showLogin(); };
 async function checkSession() {
@@ -270,7 +290,7 @@ function render() {
     if(task.endDate){ let cls='date-badge'; if(overdue) cls+=' overdue-badge'; else if(dueToday) cls+=' due-today'; else if(dueTomorrow) cls+=' due-today'; const icon=overdue?'🔴':dueToday?'🟡':dueTomorrow?'⏰':'📅'; dateBadges+='<span class="badge '+cls+'">'+icon+' Due: '+formatDate(task.endDate)+'</span>'; }
     if(task.repeat && task.repeat!=='none'){ dateBadges+='<span class="badge repeat-badge">🔁 '+task.repeat+'</span>'; }
     let subHtml=''; if(task.subtasks&&task.subtasks.length){ for(let i=0;i<task.subtasks.length;i++){ const s=task.subtasks[i]; subHtml+='<div class="subtask-row"><input type="checkbox" '+(s.done?'checked':'')+' onchange="toggleSubtask(\''+task.id+'\','+i+')"><span>'+s.title+'</span></div>'; } }
-    li.innerHTML='<div class="task-top"><input type="checkbox" '+(task.completed?'checked':'')+' onchange="toggleTask(\''+task.id+'\')"><span class="task-title '+(task.completed?'done':'')+'" onclick="openEdit(\''+task.id+'\')">'+cleanTitle(task.text)+'</span><button onclick="openEdit(\''+task.id+'\')" style="border:none;background:transparent;cursor:pointer">✏️</button><button onclick="deleteTask(\''+task.id+'\')" style="border:none;background:transparent;cursor:pointer">✕</button></div>'+subHtml+'<div class="meta"><span class="badge">'+task.priority+'</span><span class="badge">'+task.category+'</span>'+dateBadges+'</div>';
+    li.innerHTML='<div class="task-top"><input type="checkbox" '+(task.completed?'checked':'')+' onchange="toggleTask(\''+task.id+'\')"><span class="task-title '+(task.completed?'done':'')+'" onclick="openEdit(\''+task.id+'\')">'+cleanTitle(task.text)+'</span><button onclick="openEdit(\''+task.id+'\')" style="border:none;background:transparent;cursor:pointer">✏</button><button onclick="deleteTask(\''+task.id+'\')" style="border:none;background:transparent;cursor:pointer">✕</button></div>'+subHtml+'<div class="meta"><span class="badge">'+task.priority+'</span><span class="badge">'+task.category+'</span>'+dateBadges+'</div>';
     taskList.appendChild(li);
   });
   const taskCount=$('taskCount'); if(taskCount) taskCount.textContent=filtered.length+' tasks';
@@ -278,11 +298,40 @@ function render() {
 async function addTask() {
   const input=$('taskInput'); if(!input) return; const text=input.value.trim(); if(!text) return;
   const tags=parseTags(text); const prioEl=$('priorityInput'); const startEl=$('startDateInput'); const endEl=$('endDateInput'); const repeatEl=$('repeatInput'); const catEl=$('catInput');
-  const task={ id:Date.now().toString(), text:text, completed:false, priority:prioEl?prioEl.value:'medium', startDate:startEl?startEl.value:null, endDate:endEl?endEl.value:null, repeat:repeatEl?repeatEl.value:'none', category:catEl?catEl.value:'Personal', tags:tags, subtasks:[], createdAt:Date.now() };
+  const task={ 
+    id:Date.now().toString(), 
+    text:text, 
+    completed:false, 
+    priority:prioEl?prioEl.value:'medium', 
+    startDate:startEl?startEl.value:null, 
+    endDate:endEl?endEl.value:null, 
+    repeat:repeatEl?repeatEl.value:'none', 
+    category:catEl?catEl.value:'Personal', 
+    tags:tags, 
+    subtasks:[], 
+    createdAt:Date.now(),
+    user_email: currentUser ? currentUser.email : null
+  };
   tasks.unshift(task); saveLocal(); render(); input.value='';
   sendTaskEmail('created', task);
   if(currentUser&&supabaseClient){
-    try{ const result=await supabaseClient.from('tasks').insert({ user_id:currentUser.id, title:task.text, due_date:task.endDate, is_completed:false, priority:task.priority, category:task.category, tags:task.tags, subtasks:task.subtasks, start_date:task.startDate, repeat:task.repeat }).select(); if(result.data&&result.data[0]){ task.id=result.data[0].id; saveLocal(); } }catch(e){}
+    try{ 
+      const result=await supabaseClient.from('tasks').insert({ 
+        user_id: currentUser.id, 
+        user_email: currentUser.email,
+        title: task.text, 
+        due_date: task.endDate, 
+        is_completed:false, 
+        priority:task.priority, 
+        category:task.category, 
+        tags:task.tags, 
+        subtasks:task.subtasks, 
+        start_date:task.startDate, 
+        repeat:task.repeat 
+      }).select(); 
+      if(result.data&&result.data[0]){ task.id=result.data[0].id; saveLocal(); } 
+      if(result.error) console.log('Supabase insert error:', result.error.message);
+    }catch(e){ console.log(e); }
   }
 }
 window.toggleTask=async function(id){
@@ -291,7 +340,7 @@ window.toggleTask=async function(id){
   if(t.completed && t.repeat && t.repeat!=='none'){
     const nextDate=getNextRepeatDate(t.endDate, t.repeat);
     if(nextDate){
-      const newTask={ id:Date.now().toString(), text:t.text, completed:false, priority:t.priority, startDate:t.startDate?getNextRepeatDate(t.startDate,t.repeat):null, endDate:nextDate, repeat:t.repeat, category:t.category, tags:t.tags, subtasks:[], createdAt:Date.now() };
+      const newTask={ id:Date.now().toString(), text:t.text, completed:false, priority:t.priority, startDate:t.startDate?getNextRepeatDate(t.startDate,t.repeat):null, endDate:nextDate, repeat:t.repeat, category:t.category, tags:t.tags, subtasks:[], createdAt:Date.now(), user_email: currentUser ? currentUser.email : null };
       tasks.unshift(newTask); saveLocal(); render(); showToast('🔁 Next '+t.repeat+' created for '+formatDate(nextDate)); sendTaskEmail('created', newTask);
     }
   }
@@ -299,7 +348,7 @@ window.toggleTask=async function(id){
 window.deleteTask=async function(id){ tasks=tasks.filter(function(t){return t.id!==id;}); saveLocal(); render(); if(currentUser&&supabaseClient){ try{ await supabaseClient.from('tasks').delete().eq('id',id); }catch(e){} } };
 window.openEdit=function(id){ const t=tasks.find(function(x){return x.id===id;}); if(!t) return; editingId=id; tempSubtasks=JSON.parse(JSON.stringify(t.subtasks||[])); const ti=$('editTitleInput'); const di=$('editDateInput'); const pi=$('editPriorityInput'); if(ti) ti.value=t.text; if(di) di.value=t.endDate||''; if(pi) pi.value=t.priority; const em=$('editModal'); if(em) em.classList.remove('hidden'); renderEditSubtasks(); };
 window.closeEdit=function(){ const em=$('editModal'); if(em) em.classList.add('hidden'); editingId=null; };
-window.saveEdit=async function(){ const t=tasks.find(function(x){return x.id===editingId;}); if(!t) return; const ntEl=$('editTitleInput'); const nt=ntEl?ntEl.value.trim():''; if(!nt) return; t.text=nt; t.tags=parseTags(nt); const de=$('editDateInput'); const pe=$('editPriorityInput'); t.endDate=de?de.value||null:null; t.priority=pe?pe.value:'medium'; t.subtasks=tempSubtasks; saveLocal(); window.closeEdit(); render(); if(currentUser&&supabaseClient){ try{ await supabaseClient.from('tasks').update({title:t.text,due_date:t.endDate,priority:t.priority,subtasks:t.subtasks,tags:t.tags}).eq('id',editingId); }catch(e){} } };
+window.saveEdit=async function(){ const t=tasks.find(function(x){return x.id===editingId;}); if(!t) return; const ntEl=$('editTitleInput'); const nt=ntEl?ntEl.value.trim():''; if(!nt) return; t.text=nt; t.tags=parseTags(nt); const de=$('editDateInput'); const pe=$('editPriorityInput'); t.endDate=de?de.value||null:null; t.priority=pe?pe.value:'medium'; t.subtasks=tempSubtasks; saveLocal(); window.closeEdit(); render(); if(currentUser&&supabaseClient){ try{ await supabaseClient.from('tasks').update({title:t.text,due_date:t.endDate,priority:t.priority,subtasks:t.subtasks,tags:t.tags, user_email: currentUser.email}).eq('id',editingId); }catch(e){} } };
 window.addSubtaskInEdit=function(){ const v=$('newSubtaskInput'); if(!v) return; const val=v.value.trim(); if(!val) return; tempSubtasks.push({title:val,done:false}); v.value=''; renderEditSubtasks(); };
 window.renderEditSubtasks=function(){ const es=$('editSubtasks'); if(!es) return; let html=''; for(let i=0;i<tempSubtasks.length;i++){ const s=tempSubtasks[i]; html+='<div class="subtask-row"><input type="checkbox" '+(s.done?'checked':'')+' onchange="tempSubtasks['+i+'].done=!tempSubtasks['+i+'].done; renderEditSubtasks()"><span>'+s.title+'</span><button onclick="tempSubtasks.splice('+i+',1); renderEditSubtasks()" style="margin-left:auto;border:none;background:transparent;cursor:pointer">❌</button></div>'; } es.innerHTML=html||'<div style="color:var(--text2);font-size:12px;padding:8px 0">No subtasks</div>'; };
 window.toggleSubtask=async function(tid,idx){ const t=tasks.find(function(x){return x.id===tid;}); if(!t) return; t.subtasks[idx].done=!t.subtasks[idx].done; saveLocal(); render(); };
@@ -317,3 +366,4 @@ document.addEventListener('DOMContentLoaded', function(){
   checkSession(); render();
   setInterval(function(){ checkAndNotifyDueTasks(); }, 60000);
 });
+
