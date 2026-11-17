@@ -23,7 +23,7 @@ if (!window.supabaseClient) {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        flowType: implicit,
+        flowType: public,
         storage: window.localStorage
       }
     });
@@ -206,12 +206,14 @@ window.signIn = async function() {
   if(errEl) errEl.textContent='Signing in...';
   try{ const result=await supabaseClient.auth.signInWithPassword({email:e,password:p}); if(result.error){ if(errEl) errEl.textContent=result.error.message; } }catch(err){ if(errEl) errEl.textContent=err.message; }
 };
+
 window.signUp = async function() {
   const eEl=$('email'); const pEl=$('password'); const errEl=$('authError');
   const e=eEl?eEl.value.trim():''; const p=pEl?pEl.value.trim():'';
   if(p.length<6){ if(errEl) errEl.textContent='Password must be 6+ chars'; return; }
   try{ const result=await supabaseClient.auth.signUp({email:e,password:p}); if(errEl) errEl.textContent=result.error?result.error.message:'✅ Created! Now Sign In'; }catch(err){ if(errEl) errEl.textContent=err.message; }
 };
+
 window.signInWithGoogle = async function() {
   const loader=$('loadingOverlay'); if(loader) loader.classList.add('active');
   try{ 
