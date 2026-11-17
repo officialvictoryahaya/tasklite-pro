@@ -218,8 +218,8 @@ window.signInWithGoogle = async function() {
     const result=await supabaseClient.auth.signInWithOAuth({
       provider:'google',
       options:{
-        redirectTo: window.location.origin,
-        queryParams: { prompt: 'select_account' }
+            redirectTo: window.location.origin + '/',
+    queryParams: { prompt: 'select_account' }
       }
     }); 
     if(result.error){ if(loader) loader.classList.remove('active'); const errEl=$('authError'); if(errEl) errEl.textContent=result.error.message; } 
