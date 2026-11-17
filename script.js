@@ -23,7 +23,7 @@ if (!window.supabaseClient) {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        flowType: public,
+        flowType: pkce,
         storage: window.localStorage
       }
     });
