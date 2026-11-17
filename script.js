@@ -16,15 +16,6 @@ const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
 
 
 
-
-
-
-
-
-
-
-
-
 if (!window.supabaseClient) {
   try {
     window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -32,7 +23,7 @@ if (!window.supabaseClient) {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        flowType: 'pkce',
+        flowType: implicit,
         storage: window.localStorage
       }
     });
